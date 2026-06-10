@@ -43,6 +43,24 @@ export interface WebhookMessage {
   text?:     { body: string };
   audio?:    { id: string; mime_type: string };
   voice?:    { id: string; mime_type: string };
+  image?:    { id: string; mime_type: string; caption?: string };
+  document?: { id: string; mime_type: string; filename?: string; caption?: string };
+}
+
+export async function descargarMedia(mediaId: string): Promise<{ buffer: Buffer; mimeType: string }> {
+  const authHeader = { Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}` };
+
+  const meta = await axios.get<{ url: string; mime_type: string }>(
+    `${BASE_URL}/${mediaId}`,
+    { headers: authHeader }
+  );
+
+  const file = await axios.get<ArrayBuffer>(meta.data.url, {
+    headers: authHeader,
+    responseType: "arraybuffer",
+  });
+
+  return { buffer: Buffer.from(file.data), mimeType: meta.data.mime_type };
 }
 
 export interface WebhookPayload {
