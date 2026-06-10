@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hotel MG — Recepción</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #F4EFE6;
+    --surface:     #FFFFFF;
+    --card:        #FAF7F3;
+    --border:      #E2D9CC;
+    --border-soft: #EDE7DE;
+    --gold:        #8A5F1E;
+    --gold-light:  #A67828;
+    --gold-dim:    #C9A870;
+    --gold-glow:   rgba(138,95,30,.07);
+    --text:        #1C1712;
+    --text-muted:  #8B7D6B;
+    --text-dim:    #C5B8A6;
+    --green-bg:    rgba(40,100,68,.07);
+    --amber-bg:    rgba(160,110,30,.08);
+    --red:         #7A2E2E;
+    --red-bg:      rgba(122,46,46,.07);
+    --red-border:  rgba(122,46,46,.3);
+    --r:           4px;
+  }
+
+  html { font-size: 14px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9998;
+    opacity: .5;
+  }
+
+  /* ── Header ───────────────────────────────────────────────── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(244,239,230,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+
+  .header-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; height: 68px; gap: 1rem;
+  }
+
+  .hotel-brand { display: flex; flex-direction: column; }
+
+  .hotel-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem; font-weight: 600;
+    letter-spacing: .12em; color: var(--gold-light);
+    text-transform: uppercase; line-height: 1;
+  }
+
+  .hotel-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem; font-weight: 300;
+    letter-spacing: .25em; color: var(--text-muted);
+    text-transform: uppercase; margin-top: 3px;
+  }
+
+  .header-kpis {
+    display: flex; gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--r); overflow: hidden;
+  }
+
+  .kpi {
+    background: var(--surface); padding: .55rem 1.2rem;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 1px; min-width: 80px; transition: background .2s;
+  }
+  .kpi:hover { background: var(--card); }
+
+  .kpi-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 600; line-height: 1;
+    color: var(--gold);
+  }
+
+  .kpi-label {
+    font-family: 'DM Mono', monospace;
+    font-size: .56rem; letter-spacing: .18em;
+    color: var(--text-muted); text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header-meta {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 2px;
+  }
+
+  #clock {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 300;
+    color: var(--text); letter-spacing: .06em;
+  }
+
+  #date-display {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem; color: var(--text-muted);
+    letter-spacing: .15em; text-transform: uppercase;
+  }
+
+  .gold-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+
+  /* ── Main ─────────────────────────────────────────────────── */
+  main {
+    max-width: 1400px; margin: 0 auto;
+    padding: 2rem; display: flex; flex-direction: column; gap: 2rem;
+  }
+
+  .section-header {
+    display: flex; align-items: baseline;
+    gap: 1rem; margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem; font-weight: 400; font-style: italic;
+    color: var(--text); letter-spacing: .04em;
+  }
+
+  .section-count {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem; letter-spacing: .2em;
+    color: var(--text-muted); text-transform: uppercase;
+    padding: 2px 8px; border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+
+  .section-rule { flex: 1; height: 1px; background: var(--border-soft); }
+
+  /* ── Tables ───────────────────────────────────────────────── */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead tr { border-bottom: 1px solid var(--border); background: var(--card); }
+
+  th {
+    font-family: 'DM Mono', monospace;
+    font-size: .58rem; font-weight: 400;
+    letter-spacing: .2em; color: var(--text-muted);
+    text-transform: uppercase; padding: .7rem 1rem;
+    text-align: left; white-space: nowrap;
+  }
+
+  td {
+    padding: .75rem 1rem; font-size: .88rem; font-weight: 300;
+    border-bottom: 1px solid var(--border-soft); vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: var(--gold-glow); }
+
+  /* ── Room badge ───────────────────────────────────────────── */
+  .room-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 42px; height: 42px;
+    border: 1px solid var(--gold-dim); border-radius: var(--r);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 600;
+    color: var(--gold); background: var(--gold-glow);
+  }
+
+  .guest-name { font-weight: 400; color: var(--text); }
+  .guest-phone {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem; color: var(--text-muted); margin-top: 2px;
+  }
+
+  .type-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem; letter-spacing: .1em;
+    color: var(--text-muted); white-space: nowrap;
+  }
+
+  .date-cell { font-family: 'DM Mono', monospace; font-size: .8rem; white-space: nowrap; }
+  .date-label {
+    font-size: .6rem; color: var(--text-muted);
+    letter-spacing: .1em; text-transform: uppercase;
+    display: block; margin-bottom: 1px;
+  }
+
+  /* ── Pills ────────────────────────────────────────────────── */
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'DM Mono', monospace; font-size: .6rem;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap; border: 1px solid transparent;
+  }
+  .pill::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: currentColor; opacity: .7; flex-shrink: 0;
+  }
+  .pill-green { color: #286044; background: var(--green-bg); border-color: rgba(40,96,68,.25); }
+  .pill-gold  { color: var(--gold); background: var(--gold-glow); border-color: var(--gold-dim); }
+  .pill-amber { color: #8A5C10; background: var(--amber-bg); border-color: rgba(160,110,30,.3); }
+  .pill-red   { color: var(--red); background: var(--red-bg); border-color: var(--red-border); }
+
+  /* ── Nights remaining ─────────────────────────────────────── */
+  .nights-remain {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem; font-weight: 600;
+    text-align: center; line-height: 1;
+  }
+  .nights-remain.urgent { color: #8A3030; }
+  .nights-remain.soon   { color: #8A5C10; }
+  .nights-remain.ok     { color: var(--gold); }
+  .nights-unit {
+    font-family: 'DM Mono', monospace; font-size: .55rem;
+    letter-spacing: .12em; color: var(--text-muted);
+    display: block; text-transform: uppercase; margin-top: 1px;
+  }
+
+  /* ── Anular button ────────────────────────────────────────── */
+  .btn-anular {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'DM Mono', monospace; font-size: .6rem;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: var(--r);
+    border: 1px solid var(--red-border);
+    background: transparent; color: #8A3030;
+    cursor: pointer; transition: all .18s; white-space: nowrap;
+  }
+  .btn-anular:hover {
+    background: var(--red-bg); color: var(--red);
+    border-color: rgba(122,46,46,.5);
+  }
+  .btn-anular svg { width: 11px; height: 11px; opacity: .8; }
+
+  /* ── Two-col ──────────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+  /* ── Empty state ──────────────────────────────────────────── */
+  .empty-state {
+    padding: 2.5rem 1rem; text-align: center;
+    color: var(--text-dim); font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1rem;
+  }
+
+  /* ── Modal overlay ────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(28,23,18,.45);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 100%; max-width: 440px;
+    transform: translateY(12px) scale(.98);
+    transition: transform .22s ease;
+    overflow: hidden;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal-header {
+    padding: 1.2rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; font-weight: 400; font-style: italic;
+    color: var(--text);
+  }
+
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 1.2rem; line-height: 1;
+    padding: 2px 4px; transition: color .15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { padding: 1.25rem 1.5rem; }
+
+  .modal-warning {
+    display: flex; align-items: flex-start; gap: .7rem;
+    background: var(--red-bg); border: 1px solid var(--red-border);
+    border-radius: var(--r); padding: .75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .modal-warning svg { flex-shrink: 0; margin-top: 1px; }
+  .modal-warning-text {
+    font-size: .82rem; color: #7A2E2E; line-height: 1.45;
+  }
+
+  .modal-detail {
+    display: grid; grid-template-columns: auto 1fr; gap: .4rem 1rem;
+    margin-bottom: .3rem;
+  }
+  .modal-detail-label {
+    font-family: 'DM Mono', monospace; font-size: .62rem;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-muted); padding-top: 1px;
+  }
+  .modal-detail-value { font-size: .88rem; font-weight: 400; color: var(--text); }
+  .modal-detail-value.mono {
+    font-family: 'DM Mono', monospace; font-size: .78rem;
+  }
+
+  .modal-divider { height: 1px; background: var(--border-soft); margin: 1rem 0; }
+
+  .modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex; gap: .75rem; justify-content: flex-end;
+  }
+
+  .btn-cancel {
+    font-family: 'DM Mono', monospace; font-size: .62rem;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: .55rem 1.2rem; border-radius: var(--r);
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text-muted);
+    cursor: pointer; transition: all .15s;
+  }
+  .btn-cancel:hover { background: var(--card); color: var(--text); }
+
+  .btn-confirm-anular {
+    font-family: 'DM Mono', monospace; font-size: .62rem;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: .55rem 1.2rem; border-radius: var(--r);
+    border: 1px solid var(--red-border);
+    background: var(--red-bg); color: var(--red);
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-confirm-anular:hover {
+    background: rgba(122,46,46,.14); color: #5A1A1A;
+  }
+  .btn-confirm-anular:disabled { opacity: .5; cursor: not-allowed; }
+
+  .spinner {
+    width: 12px; height: 12px;
+    border: 2px solid rgba(122,46,46,.2);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Toast ────────────────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    z-index: 600;
+    font-family: 'DM Mono', monospace; font-size: .72rem;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: .65rem 1.4rem; border-radius: 20px;
+    opacity: 0; transition: opacity .2s, transform .2s;
+    pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success {
+    background: rgba(40,96,68,.1); border: 1px solid rgba(40,96,68,.3);
+    color: #286044;
+  }
+  .toast.error {
+    background: var(--red-bg); border: 1px solid var(--red-border);
+    color: var(--red);
+  }
+
+  /* ── Footer ───────────────────────────────────────────────── */
+  footer {
+    max-width: 1400px; margin: 0 auto;
+    padding: 1rem 2rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--text-dim);
+  }
+  .footer-text { font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; }
+  .refresh-bar { display: flex; align-items: center; gap: .6rem; font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .12em; color: var(--text-dim); text-transform: uppercase; }
+  .refresh-track { width: 80px; height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .refresh-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 2px; transform-origin: left; animation: countdown 60s linear forwards; }
+  @keyframes countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+  .error-banner {
+    background: var(--red-bg); border: 1px solid var(--red);
+    border-radius: var(--r); padding: 1rem 1.5rem;
+    font-family: 'DM Mono', monospace; font-size: .78rem;
+    color: #C07070; display: none;
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, #F0EBE2 25%, #E8E2D8 50%, #F0EBE2 75%);
+    background-size: 400% 100%;
+    animation: shimmer 1.5s infinite; height: 52px; border-radius: var(--r);
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  .fade-in { opacity: 0; transform: translateY(8px); animation: fadeUp .5s ease forwards; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 900px) {
+    .two-col { grid-template-columns: 1fr; }
+    .header-inner { grid-template-columns: 1fr auto; }
+    .header-meta { display: none; }
+  }
+  @media (max-width: 600px) {
+    main { padding: 1rem; }
+    .kpi { min-width: 60px; padding: .5rem .8rem; }
+    .kpi-value { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <div class="hotel-brand">
+      <div class="hotel-name">Hotel MG</div>
+      <div class="hotel-subtitle">Panel de Recepción</div>
+    </div>
+    <div class="header-kpis">
+      <div class="kpi"><span class="kpi-value" id="kpi-ocupadas">—</span><span class="kpi-label">Ocupadas</span></div>
+      <div class="kpi"><span class="kpi-value" id="kpi-total">—</span><span class="kpi-label">Total</span></div>
+      <div class="kpi"><span class="kpi-value" id="kpi-entradas">—</span><span class="kpi-label">Entradas hoy</span></div>
+      <div class="kpi"><span class="kpi-value" id="kpi-salidas">—</span><span class="kpi-label">Salidas hoy</span></div>
+    </div>
+    <div class="header-meta">
+      <div id="clock">—</div>
+      <div id="date-display">—</div>
+    </div>
+  </div>
+  <div class="gold-rule"></div>
+</header>
+
+<!-- ── Main ───────────────────────────────────────────────────── -->
+<main>
+  <div class="error-banner" id="error-banner"></div>
+
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">Ocupaciones activas</h2>
+      <span class="section-count" id="count-activas">0 habitaciones</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Hab.</th><th>Tipo</th><th>Huésped</th>
+            <th>Check-in</th><th>Check-out</th>
+            <th>Noches rest.</th><th>Estado</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-activas">
+          <tr><td colspan="8"><div class="shimmer"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="two-col">
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">Próximas entradas</h2>
+        <span class="section-count" id="count-entradas">confirmadas</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Hab.</th><th>Huésped</th><th>Ingreso</th><th>Salida</th><th>Noc.</th><th></th></tr>
+          </thead>
+          <tbody id="tbody-entradas">
+            <tr><td colspan="6"><div class="shimmer"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">Próximas salidas</h2>
+        <span class="section-count" id="count-salidas">huéspedes activos</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Hab.</th><th>Huésped</th><th>Check-out</th><th>Días rest.</th></tr>
+          </thead>
+          <tbody id="tbody-salidas">
+            <tr><td colspan="4"><div class="shimmer"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ── Footer ─────────────────────────────────────────────────── -->
+<footer>
+  <span class="footer-text" id="last-update">Cargando…</span>
+  <div class="refresh-bar">
+    <span>Actualizando en</span>
+    <div class="refresh-track"><div class="refresh-fill" id="refresh-fill"></div></div>
+    <span id="refresh-countdown">60s</span>
+  </div>
+</footer>
+
+<!-- ── Modal de confirmación ──────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title-text">Anular reserva</span>
+      <button class="modal-close" id="modal-close-btn" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-warning">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1.5L14.5 13H1.5L8 1.5Z" stroke="#7A2E2E" stroke-width="1.2" fill="none"/>
+          <path d="M8 6v3.5" stroke="#7A2E2E" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="8" cy="11.2" r=".6" fill="#7A2E2E"/>
+        </svg>
+        <div class="modal-warning-text">Esta acción es irreversible. La reserva quedará marcada como <strong>Anulada</strong> en el sistema.</div>
+      </div>
+      <div class="modal-detail" id="modal-detail">
+        <!-- poblado por JS -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="modal-cancel-btn">Cancelar</button>
+      <button class="btn-confirm-anular" id="modal-confirm-btn">
+        <div class="spinner" id="modal-spinner"></div>
+        <span id="modal-confirm-label">Confirmar anulación</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── Clock ───────────────────────────────────────────────── */
+  const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+  function updateClock() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2,'0');
+    document.getElementById('clock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    document.getElementById('date-display').textContent =
+      `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  /* ── Helpers ─────────────────────────────────────────────── */
+  const fmtDate = (iso) => { const [,m,d] = iso.split('-'); return `${d}/${m}/${iso.slice(0,4)}`; };
+  const fmtCLP  = (n)   => `$${Number(n).toLocaleString('es-CL')}`;
+
+  const roomBadge = (num) =>
+    `<div class="room-badge">${num}</div>`;
+
+  const typeTag = (tipo) =>
+    `<span class="type-tag">${tipo.replace('Estándar','Std.').replace('Superior','Sup.').replace('Familiar','Fam.')}</span>`;
+
+  const guestCell = (h, t) =>
+    `<div class="guest-name">${h}</div><div class="guest-phone">${t}</div>`;
+
+  const dateCell = (iso, label) =>
+    `<div class="date-cell"><span class="date-label">${label}</span>${fmtDate(iso)}</div>`;
+
+  const nightsRemain = (d) => {
+    const cls = d <= 0 ? 'urgent' : d === 1 ? 'soon' : 'ok';
+    const val = d <= 0 ? 'HOY' : d;
+    const unit = d <= 0 ? '' : `<span class="nights-unit">noche${d!==1?'s':''}</span>`;
+    return `<div class="nights-remain ${cls}">${val}${unit}</div>`;
+  };
+
+  const statusPill = (r) => r.saleHoy
+    ? `<span class="pill pill-red">Sale hoy</span>`
+    : r.saleManana
+      ? `<span class="pill pill-amber">Sale mañana</span>`
+      : `<span class="pill pill-green">En estadía</span>`;
+
+  const entradaPill = (d) => d === 0
+    ? `<span class="pill pill-gold">Entra hoy</span>`
+    : d === 1
+      ? `<span class="pill pill-amber">Mañana</span>`
+      : `<span class="pill pill-green">${d}d</span>`;
+
+  const emptyRow = (cols, msg) =>
+    `<tr><td colspan="${cols}" class="empty-state">${msg}</td></tr>`;
+
+  const anularBtn = (id, huesped) =>
+    `<button class="btn-anular" onclick="abrirModal(${JSON.stringify(id)},event)" title="Anular reserva de ${huesped}">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+        <line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/>
+      </svg>
+      Anular
+    </button>`;
+
+  /* ── Render ──────────────────────────────────────────────── */
+  let _allData = null;
+
+  function renderActivas(rows) {
+    const tb = document.getElementById('tbody-activas');
+    document.getElementById('count-activas').textContent =
+      `${rows.length} habitación${rows.length!==1?'es':''}`;
+    if (!rows.length) { tb.innerHTML = emptyRow(8,'Sin ocupaciones activas'); return; }
+    tb.innerHTML = rows.map((r,i) => `
+      <tr class="fade-in" style="animation-delay:${i*.04}s">
+        <td>${roomBadge(r.habitacion)}</td>
+        <td>${typeTag(r.tipo)}</td>
+        <td>${guestCell(r.huesped, r.telefono)}</td>
+        <td>${dateCell(r.fechaIngreso,'Check-in')}</td>
+        <td>${dateCell(r.fechaSalida,'Check-out')}</td>
+        <td style="text-align:center">${nightsRemain(r.diasRestantes)}</td>
+        <td>${statusPill(r)}</td>
+        <td>${anularBtn(r.id, r.huesped)}</td>
+      </tr>`).join('');
+  }
+
+  function renderEntradas(rows) {
+    const tb = document.getElementById('tbody-entradas');
+    document.getElementById('count-entradas').textContent = `${rows.length} confirmada${rows.length!==1?'s':''}`;
+    if (!rows.length) { tb.innerHTML = emptyRow(6,'Sin entradas próximas'); return; }
+    tb.innerHTML = rows.map((r,i) => `
+      <tr class="fade-in" style="animation-delay:${i*.04}s">
+        <td>${roomBadge(r.habitacion)}</td>
+        <td>${guestCell(r.huesped, r.telefono)}</td>
+        <td>
+          ${dateCell(r.fechaIngreso,'Ingreso')}
+          <div style="margin-top:4px">${entradaPill(r.diasParaIngreso)}</div>
+        </td>
+        <td>${dateCell(r.fechaSalida,'Salida')}</td>
+        <td style="text-align:center">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold)">${r.noches}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.55rem;color:var(--text-muted);display:block;letter-spacing:.1em">NOC.</span>
+        </td>
+        <td>${anularBtn(r.id, r.huesped)}</td>
+      </tr>`).join('');
+  }
+
+  function renderSalidas(rows) {
+    const tb = document.getElementById('tbody-salidas');
+    document.getElementById('count-salidas').textContent =
+      `${rows.length} huésped${rows.length!==1?'es':''} activo${rows.length!==1?'s':''}`;
+    if (!rows.length) { tb.innerHTML = emptyRow(4,'Sin salidas próximas'); return; }
+    tb.innerHTML = rows.map((r,i) => `
+      <tr class="fade-in" style="animation-delay:${i*.04}s">
+        <td>${roomBadge(r.habitacion)}</td>
+        <td>${guestCell(r.huesped, r.telefono)}</td>
+        <td>${dateCell(r.fechaSalida,'Check-out')}</td>
+        <td style="text-align:center">${nightsRemain(r.diasRestantes)}</td>
+      </tr>`).join('');
+  }
+
+  /* ── Fetch ───────────────────────────────────────────────── */
+  let refreshTimer = 60;
+
+  function resetRefreshBar() {
+    const fill = document.getElementById('refresh-fill');
+    fill.style.animation = 'none';
+    void fill.offsetWidth;
+    fill.style.animation = 'countdown 60s linear forwards';
+    refreshTimer = 60;
+  }
+
+  async function fetchDashboard() {
+    try {
+      const res  = await fetch('/api/hotel/dashboard');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      _allData = data;
+
+      document.getElementById('kpi-ocupadas').textContent = data.resumen.ocupadas;
+      document.getElementById('kpi-total').textContent    = data.resumen.totalHabitaciones;
+      document.getElementById('kpi-entradas').textContent = data.resumen.entradasHoy;
+      document.getElementById('kpi-salidas').textContent  = data.resumen.salidasHoy;
+
+      renderActivas(data.activas);
+      renderEntradas(data.proximasEntradas);
+      renderSalidas(data.proximasSalidas);
+
+      const now = new Date();
+      document.getElementById('last-update').textContent =
+        `Última actualización: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      document.getElementById('error-banner').style.display = 'none';
+      resetRefreshBar();
+    } catch (err) {
+      const b = document.getElementById('error-banner');
+      b.style.display = 'block';
+      b.textContent   = `Error al cargar datos: ${err.message}`;
+    }
+  }
+
+  setInterval(() => {
+    refreshTimer--;
+    document.getElementById('refresh-countdown').textContent = `${refreshTimer}s`;
+    if (refreshTimer <= 0) fetchDashboard();
+  }, 1000);
+
+  /* ── Modal ───────────────────────────────────────────────── */
+  let _pendingId = null;
+
+  function findReserva(id) {
+    if (!_allData) return null;
+    return [
+      ..._allData.activas,
+      ..._allData.proximasEntradas,
+    ].find((r) => r.id === id) || null;
+  }
+
+  function abrirModal(id, event) {
+    event.stopPropagation();
+    _pendingId = id;
+    const r = findReserva(id);
+
+    const detail = r ? `
+      <span class="modal-detail-label">ID</span>
+      <span class="modal-detail-value mono">${r.id}</span>
+
+      <span class="modal-detail-label">Huésped</span>
+      <span class="modal-detail-value">${r.huesped}</span>
+
+      <span class="modal-detail-label">Habitación</span>
+      <span class="modal-detail-value">${r.habitacion} — ${r.tipo || ''}</span>
+
+      <span class="modal-detail-label">Check-in</span>
+      <span class="modal-detail-value mono">${fmtDate(r.fechaIngreso)}</span>
+
+      <span class="modal-detail-label">Check-out</span>
+      <span class="modal-detail-value mono">${fmtDate(r.fechaSalida)}</span>
+
+      <span class="modal-detail-label">Total</span>
+      <span class="modal-detail-value">${fmtCLP(r.totalCLP)}</span>
+    ` : `
+      <span class="modal-detail-label">ID</span>
+      <span class="modal-detail-value mono">${id}</span>
+    `;
+
+    document.getElementById('modal-detail').innerHTML = detail;
+    document.getElementById('modal-confirm-btn').disabled = false;
+    document.getElementById('modal-confirm-label').textContent = 'Confirmar anulación';
+    document.getElementById('modal-spinner').style.display = 'none';
+    document.getElementById('modal-overlay').classList.add('open');
+    document.getElementById('modal-confirm-btn').focus();
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    _pendingId = null;
+  }
+
+  async function confirmarAnulacion() {
+    if (!_pendingId) return;
+    const btn     = document.getElementById('modal-confirm-btn');
+    const spinner = document.getElementById('modal-spinner');
+    const label   = document.getElementById('modal-confirm-label');
+
+    btn.disabled         = true;
+    spinner.style.display = 'block';
+    label.textContent    = 'Anulando…';
+
+    try {
+      const res  = await fetch(`/api/hotel/anular/${_pendingId}`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.mensaje || `HTTP ${res.status}`);
+
+      cerrarModal();
+      showToast(`Reserva ${_pendingId} anulada correctamente`, 'success');
+      await fetchDashboard();
+    } catch (err) {
+      cerrarModal();
+      showToast(`Error: ${err.message}`, 'error');
+      btn.disabled         = false;
+      spinner.style.display = 'none';
+      label.textContent    = 'Confirmar anulación';
+    }
+  }
+
+  /* ── Toast ───────────────────────────────────────────────── */
+  let _toastTimer;
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = `toast ${type}`;
+    void t.offsetWidth;
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  /* ── Event listeners ─────────────────────────────────────── */
+  document.getElementById('modal-close-btn').addEventListener('click', cerrarModal);
+  document.getElementById('modal-cancel-btn').addEventListener('click', cerrarModal);
+  document.getElementById('modal-confirm-btn').addEventListener('click', confirmarAnulacion);
+
+  document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) cerrarModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarModal();
+  });
+
+  /* ── Init ────────────────────────────────────────────────── */
+  fetchDashboard();
+</script>
+</body>
+</html>

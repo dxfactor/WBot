@@ -1,0 +1,65 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  PROJECT_ID:  ${{ secrets.GCP_PROJECT_ID }}
+  REGION:      us-central1
+  SERVICE:     wbot
+  REGISTRY:    us-central1-docker.pkg.dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
+
+      - name: Build & push image
+        run: |
+          IMAGE=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/wbot/${{ env.SERVICE }}:${{ github.sha }}
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Deploy to Cloud Run
+        run: |
+          IMAGE=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/wbot/${{ env.SERVICE }}:${{ github.sha }}
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image "$IMAGE" \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --min-instances 1 \
+            --add-cloudsql-instances ${{ secrets.CLOUD_SQL_INSTANCE }} \
+            --set-env-vars "\
+              DB_SOCKET_PATH=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }},\
+              DB_DATABASE=${{ secrets.DB_DATABASE }},\
+              DB_USERNAME=${{ secrets.DB_USERNAME }},\
+              DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
+              WHATSAPP_PHONE_NUMBER_ID=${{ secrets.WHATSAPP_PHONE_NUMBER_ID }},\
+              WHATSAPP_VERIFY_TOKEN=${{ secrets.WHATSAPP_VERIFY_TOKEN }},\
+              VENDEDOR_PHONE=${{ secrets.VENDEDOR_PHONE }},\
+              BUSINESS_NAME=Ferretería Tarugo,\
+              SESSION_SECRET=${{ secrets.SESSION_SECRET }},\
+              DASHBOARD_USER=${{ secrets.DASHBOARD_USER }},\
+              DASHBOARD_PASS=${{ secrets.DASHBOARD_PASS }},\
+              PORT=8080" \
+            --set-secrets "WHATSAPP_ACCESS_TOKEN=WHATSAPP_ACCESS_TOKEN:latest,\
+              ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,\
+              OPENAI_API_KEY=OPENAI_API_KEY:latest"

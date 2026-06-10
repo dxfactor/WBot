@@ -1,0 +1,229 @@
+{
+  "productos": [
+    {
+      "id": "HER001",
+      "nombre": "Taladro percutor Bosch GSB 550",
+      "categoria": "Herramientas Eléctricas",
+      "precio": 89990,
+      "stock": 8,
+      "descripcion": "Taladro percutor Bosch GSB 550W, mandril 13mm, 2 velocidades, incluye maletín y 2 brocas.",
+      "sku": "BSH-GSB550"
+    },
+    {
+      "id": "HER002",
+      "nombre": "Amoladora angular Dewalt 115mm",
+      "categoria": "Herramientas Eléctricas",
+      "precio": 74990,
+      "stock": 5,
+      "descripcion": "Amoladora angular Dewalt DWE4011, 710W, disco 115mm, protección contra sobrecargas.",
+      "sku": "DEW-DWE4011"
+    },
+    {
+      "id": "HER003",
+      "nombre": "Sierra caladora Black+Decker",
+      "categoria": "Herramientas Eléctricas",
+      "precio": 59990,
+      "stock": 6,
+      "descripcion": "Sierra caladora Black+Decker KS501, 400W, 3000 cpm, para madera hasta 55mm y metal hasta 4mm.",
+      "sku": "BD-KS501"
+    },
+    {
+      "id": "HER004",
+      "nombre": "Atornillador inalámbrico Bosch GO 2",
+      "categoria": "Herramientas Eléctricas",
+      "precio": 49990,
+      "stock": 12,
+      "descripcion": "Atornillador inalámbrico Bosch GO 2, batería 3.6V, 5Nm, carga USB-C, compacto y liviano.",
+      "sku": "BSH-GO2"
+    },
+    {
+      "id": "HER005",
+      "nombre": "Martillo carpintero 500g",
+      "categoria": "Herramientas Manuales",
+      "precio": 12990,
+      "stock": 30,
+      "descripcion": "Martillo carpintero mango fibra de vidrio, cabeza 500g, antideslizante, uña extractora.",
+      "sku": "MAR-500G"
+    },
+    {
+      "id": "HER006",
+      "nombre": "Juego destornilladores Stanley 6 piezas",
+      "categoria": "Herramientas Manuales",
+      "precio": 18990,
+      "stock": 20,
+      "descripcion": "Set 6 destornilladores Stanley: 3 planos y 3 Phillips, mango bimateria antideslizante.",
+      "sku": "STN-DST6"
+    },
+    {
+      "id": "HER007",
+      "nombre": "Llave ajustable 10\" Bahco",
+      "categoria": "Herramientas Manuales",
+      "precio": 22990,
+      "stock": 15,
+      "descripcion": "Llave ajustable Bahco 80 10 pulgadas, apertura máx 28mm, acero cromo vanadio.",
+      "sku": "BAH-10ADJ"
+    },
+    {
+      "id": "HER008",
+      "nombre": "Nivel de burbuja 60cm Stanley",
+      "categoria": "Herramientas Manuales",
+      "precio": 16990,
+      "stock": 18,
+      "descripcion": "Nivel de burbuja Stanley 60cm, 3 matraces, cuerpo aluminio, medición horizontal y vertical.",
+      "sku": "STN-NIV60"
+    },
+    {
+      "id": "FIJ001",
+      "nombre": "Tornillos autoperforantes 6x1\" (caja 100u)",
+      "categoria": "Fijaciones y Tornillería",
+      "precio": 4990,
+      "stock": 80,
+      "descripcion": "Tornillos autoperforantes cabeza hexagonal 6x1 pulgada, acero zincado, caja 100 unidades.",
+      "sku": "TOR-AUTO6X1"
+    },
+    {
+      "id": "FIJ002",
+      "nombre": "Tarugos plásticos N°8 (bolsa 50u)",
+      "categoria": "Fijaciones y Tornillería",
+      "precio": 2990,
+      "stock": 100,
+      "descripcion": "Tarugos plásticos número 8, color gris, para pared de mampostería y hormigón, bolsa 50 unidades.",
+      "sku": "TAR-P8-50"
+    },
+    {
+      "id": "FIJ003",
+      "nombre": "Adhesivo de montaje Loctite 375g",
+      "categoria": "Fijaciones y Tornillería",
+      "precio": 9990,
+      "stock": 40,
+      "descripcion": "Adhesivo de montaje Loctite Power Grab Express 375g, fijación sin taladro, interior y exterior.",
+      "sku": "LOC-PMG375"
+    },
+    {
+      "id": "PIN001",
+      "nombre": "Pintura látex interior blanco 4L",
+      "categoria": "Pintura y Accesorios",
+      "precio": 24990,
+      "stock": 25,
+      "descripcion": "Pintura látex interior color blanco mate, rendimiento 10-12 m²/L, lavable, secado 1 hora, balde 4 litros.",
+      "sku": "PIN-LAT-BL4"
+    },
+    {
+      "id": "PIN002",
+      "nombre": "Pintura esmalte sintético negro 1L",
+      "categoria": "Pintura y Accesorios",
+      "precio": 14990,
+      "stock": 20,
+      "descripcion": "Esmalte sintético negro brillante 1 litro, para madera y metal, resistente a golpes y humedad.",
+      "sku": "PIN-ESM-NG1"
+    },
+    {
+      "id": "PIN003",
+      "nombre": "Rodillo lana 22cm con mango",
+      "categoria": "Pintura y Accesorios",
+      "precio": 8990,
+      "stock": 35,
+      "descripcion": "Rodillo de lana 22cm con mango extensible 40cm, para pintura látex en paredes y cielorrasos.",
+      "sku": "ROD-LAN22"
+    },
+    {
+      "id": "PIN004",
+      "nombre": "Pincel plano N°2 cerda natural",
+      "categoria": "Pintura y Accesorios",
+      "precio": 3990,
+      "stock": 50,
+      "descripcion": "Pincel plano número 2, cerda natural, mango madera, para esmaltes y barnices.",
+      "sku": "PNC-PL2"
+    },
+    {
+      "id": "PLO001",
+      "nombre": "Cinta teflón 12mm x 10m",
+      "categoria": "Plomería",
+      "precio": 1990,
+      "stock": 150,
+      "descripcion": "Cinta teflón PTFE 12mm x 10 metros, para sellado de uniones roscadas en tuberías de agua y gas.",
+      "sku": "TEF-12X10"
+    },
+    {
+      "id": "PLO002",
+      "nombre": "Llave de paso esférica 1/2\"",
+      "categoria": "Plomería",
+      "precio": 11990,
+      "stock": 22,
+      "descripcion": "Llave de paso esférica 1/2 pulgada, latón niquelado, palanca mariposa, para agua fría y caliente.",
+      "sku": "LLP-ESP-12"
+    },
+    {
+      "id": "PLO003",
+      "nombre": "Silicona sanitaria blanca 280ml",
+      "categoria": "Plomería",
+      "precio": 7990,
+      "stock": 45,
+      "descripcion": "Silicona acetínica sanitaria color blanco 280ml, resistente al agua y hongos, para baños y cocinas.",
+      "sku": "SIL-SAN-BL"
+    },
+    {
+      "id": "ELE001",
+      "nombre": "Cable unipolar 2.5mm² (rollo 25m)",
+      "categoria": "Electricidad",
+      "precio": 19990,
+      "stock": 30,
+      "descripcion": "Cable unipolar de cobre 2.5mm², aislación 750V, color rojo, rollo 25 metros. Para instalaciones domiciliarias.",
+      "sku": "CAB-UNI25-R"
+    },
+    {
+      "id": "ELE002",
+      "nombre": "Cinta aisladora 3M Temflex 20m",
+      "categoria": "Electricidad",
+      "precio": 3490,
+      "stock": 90,
+      "descripcion": "Cinta aisladora eléctrica 3M Temflex 1500, 19mm x 20m, resistencia 600V, temperatura -18°C a 105°C.",
+      "sku": "3M-TEM20"
+    },
+    {
+      "id": "ELE003",
+      "nombre": "Toma corriente doble con tierra",
+      "categoria": "Electricidad",
+      "precio": 6990,
+      "stock": 40,
+      "descripcion": "Toma corriente doble con toma de tierra IRAM, para embutir, 16A/250V, color blanco.",
+      "sku": "TOM-DBL-T"
+    },
+    {
+      "id": "SEG001",
+      "nombre": "Guantes de trabajo multifunción L",
+      "categoria": "Seguridad",
+      "precio": 8990,
+      "stock": 28,
+      "descripcion": "Guantes de trabajo talla L, palma cuero vacuno, dorso tela elástica, refuerzo en pulgar e índice.",
+      "sku": "GUA-TRA-L"
+    },
+    {
+      "id": "SEG002",
+      "nombre": "Anteojos de seguridad transparentes",
+      "categoria": "Seguridad",
+      "precio": 5990,
+      "stock": 35,
+      "descripcion": "Anteojos de seguridad lente policarbonato transparente, protección UV, marco ajustable.",
+      "sku": "ANT-SEG-TR"
+    },
+    {
+      "id": "SEG003",
+      "nombre": "Casco de obra blanco",
+      "categoria": "Seguridad",
+      "precio": 14990,
+      "stock": 15,
+      "descripcion": "Casco de seguridad industrial blanco, polietileno de alta densidad, ajuste rueda, clase E 20.000V.",
+      "sku": "CAS-OBR-BL"
+    }
+  ],
+  "categorias": [
+    "Herramientas Eléctricas",
+    "Herramientas Manuales",
+    "Fijaciones y Tornillería",
+    "Pintura y Accesorios",
+    "Plomería",
+    "Electricidad",
+    "Seguridad"
+  ]
+}

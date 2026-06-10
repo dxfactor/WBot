@@ -1,0 +1,11 @@
+arrancar la aplicación
+
+cd /Users/dongabo/Desktop/WhatsappBot
+  npm run dev
+
+
+arrancar servidor ngrok
+ngrok http 3000
+
+
+

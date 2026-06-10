@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+data/pedidos.xlsx
+Archivo.zip
+WhatsappBot.mp4
+logo.psd
+.claude/
+.github/
