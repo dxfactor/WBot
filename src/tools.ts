@@ -7,7 +7,7 @@ import {
   obtenerProductosPorCategoria,
   obtenerProductoPorId,
 } from "./catalog";
-import { registrarPedido } from "./orders";
+import { registrarPedido, consultarPedido, actualizarPedido } from "./orders";
 
 // Definiciones de herramientas que Claude puede invocar
 export const toolDefinitions: Anthropic.Tool[] = [
@@ -93,6 +93,39 @@ export const toolDefinitions: Anthropic.Tool[] = [
         },
       },
       required: ["producto_id"],
+    },
+  },
+  {
+    name: "consultar_pedido",
+    description:
+      "Consulta los detalles completos de un pedido por su número. Úsalo cuando el cliente quiera ver o editar su pedido. Devuelve el estado actual — si ya no es Pendiente, informa que no se puede modificar.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        numero_pedido: {
+          type: "number",
+          description: "Número del pedido sin ceros (ej: 8 para el pedido #0008)",
+        },
+      },
+      required: ["numero_pedido"],
+    },
+  },
+  {
+    name: "actualizar_pedido",
+    description:
+      "Actualiza el contenido de un pedido que sigue en estado Pendiente. Úsalo SOLO después de que el cliente confirmó los nuevos datos. Falla automáticamente si el pedido ya cambió de estado.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        numero_pedido:     { type: "number",  description: "Número del pedido a editar" },
+        productos:         { type: "string",  description: "Nueva descripción completa de productos y cantidades" },
+        total:             { type: "number",  description: "Nuevo total en CLP" },
+        cliente_direccion: { type: "string",  description: "Nueva dirección de despacho" },
+        tipo_documento:    { type: "string",  enum: ["boleta", "factura"], description: "Nuevo tipo de documento" },
+        razon_social:      { type: "string",  description: "Nueva razón social (solo factura)" },
+        giro:              { type: "string",  description: "Nuevo giro (solo factura)" },
+      },
+      required: ["numero_pedido"],
     },
   },
   {
@@ -185,9 +218,43 @@ export async function ejecutarHerramienta(name: string, input: Record<string, un
       return JSON.stringify(producto);
     }
 
+    case "consultar_pedido": {
+      const id     = input.numero_pedido as number;
+      const pedido = await consultarPedido(id);
+      if (!pedido) {
+        return JSON.stringify({ error: `No existe el pedido #${String(id).padStart(4, "0")}.` });
+      }
+      return JSON.stringify({
+        ...pedido,
+        numeroPedido: `#${String(pedido.id).padStart(4, "0")}`,
+        editable: pedido.estado === "Pendiente",
+      });
+    }
+
+    case "actualizar_pedido": {
+      const id = input.numero_pedido as number;
+      try {
+        await actualizarPedido(id, {
+          productos:        input.productos        as string | undefined,
+          total:            input.total            as number | undefined,
+          clienteDireccion: input.cliente_direccion as string | undefined,
+          tipoDocumento:    input.tipo_documento   as "boleta" | "factura" | undefined,
+          razonSocial:      input.razon_social     as string | undefined,
+          giro:             input.giro             as string | undefined,
+        });
+        return JSON.stringify({
+          ok: true,
+          numeroPedido: `#${String(id).padStart(4, "0")}`,
+          mensaje: `Pedido #${String(id).padStart(4, "0")} actualizado correctamente.`,
+        });
+      } catch (error) {
+        return JSON.stringify({ ok: false, mensaje: (error as Error).message });
+      }
+    }
+
     case "registrar_pedido": {
       try {
-        await registrarPedido({
+        const numeroPedido = await registrarPedido({
           clienteNombre: input.cliente_nombre as string,
           clienteRut: input.cliente_rut as string,
           clienteTelefono: input.cliente_telefono as string,
@@ -199,7 +266,11 @@ export async function ejecutarHerramienta(name: string, input: Record<string, un
           total: input.total as number,
           whatsappCliente: input.whatsapp_cliente as string,
         });
-        return JSON.stringify({ ok: true, mensaje: "Pedido registrado y vendedor notificado." });
+        return JSON.stringify({
+          ok: true,
+          numeroPedido,
+          mensaje: `Pedido #${String(numeroPedido).padStart(4, "0")} registrado. El vendedor ha sido notificado.`,
+        });
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error("[tools] Error registrando pedido:", msg);
