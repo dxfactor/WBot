@@ -1118,6 +1118,28 @@
       align-items: center;
       gap: 4px;
     }
+
+    /* ── Modal cotización ──────────────────────────────────────────────── */
+    #modal-cot { max-width: 780px; }
+    .cot-head  { padding: 20px 24px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+    .cot-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .cot-meta  { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .cot-body  { padding: 18px 24px; max-height: 58vh; overflow-y: auto; }
+    .cot-desc  { font-size: 13px; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; line-height: 1.6; }
+    .cot-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .cot-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); background: var(--bg); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .cot-table th.tr { text-align: right; }
+    .cot-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    .cot-table tr:last-child td { border-bottom: none; }
+    .cot-table tr:hover td { background: #f8fafc; }
+    .cot-table td.tr { text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .cot-table td.muted { color: var(--text-muted); }
+    .margen-ok   { display:inline-flex;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:var(--green-light);color:var(--green);  }
+    .margen-warn { display:inline-flex;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:var(--amber-light);color:var(--amber);  }
+    .margen-low  { display:inline-flex;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:var(--red-light);  color:var(--red);    }
+    .cot-foot { padding: 14px 24px; border-top: 1px solid var(--border); background: var(--bg); border-radius: 0 0 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .cot-loading { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+    .tipo-badge { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--accent-light);color:var(--accent); }
   </style>
 </head>
 
@@ -1189,6 +1211,9 @@
       </a>
       <a class="nav-item" onclick="navigate('clientes',this)">
         <i data-lucide="users" class="icon"></i>Clientes
+      </a>
+      <a class="nav-item" onclick="navigate('cotizaciones',this)">
+        <i data-lucide="file-text" class="icon"></i>Cotizaciones
       </a>
     </nav>
 
@@ -1373,8 +1398,71 @@
         </div>
       </div>
 
+      <!-- ─── COTIZACIONES ──────────────────────────────────────────────── -->
+      <div class="section" id="sec-cotizaciones">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <span class="card-title">Cotizaciones recibidas</span>
+              <span class="count-pill" id="cnt-cot">—</span>
+            </div>
+            <div class="search-wrap">
+              <i data-lucide="search" class="s-icon"></i>
+              <input class="search-input" type="text" placeholder="Buscar…" id="q-cot" oninput="renderCotizaciones()">
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Fecha</th><th>WhatsApp</th><th>Descripción</th><th>Tipo</th><th>Productos</th><th>Estado</th>
+            </tr></thead>
+            <tbody id="tbody-cot">
+              <tr class="sk-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div><!-- /content -->
   </main>
+
+  <!-- ═══════════════ MODAL COTIZACIÓN ═══════════════ -->
+  <div class="modal-overlay" id="modal-cot-overlay" onclick="closeCotModalOnBg(event)">
+    <div class="modal" id="modal-cot">
+
+      <div class="cot-head">
+        <div>
+          <div class="cot-title" id="cot-title">Cotización</div>
+          <div class="cot-meta" id="cot-meta"></div>
+        </div>
+        <button class="btn-close-modal" onclick="closeCotModal()">
+          <i data-lucide="x" style="width:18px;height:18px"></i>
+        </button>
+      </div>
+
+      <div class="cot-body">
+        <div class="cot-desc" id="cot-desc"></div>
+
+        <div id="cot-table-wrap">
+          <div class="cot-loading">
+            <i data-lucide="loader" style="width:20px;height:20px;animation:spin .8s linear infinite"></i>
+            <div style="margin-top:8px">Cargando comparativa…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cot-foot">
+        <select class="status-select" id="cot-status" style="flex:0 0 200px">
+          <option value="Recibida">⏳  Recibida</option>
+          <option value="Revisada">👁  Revisada</option>
+          <option value="Respondida">✓  Respondida</option>
+          <option value="Cerrada">✗  Cerrada</option>
+        </select>
+        <span class="save-feedback" id="cot-feedback"></span>
+        <button class="btn-save" id="cot-save-btn" onclick="guardarEstadoCot()">Guardar estado</button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ═══════════════ MODAL PEDIDO ═══════════════ -->
   <div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
@@ -1464,10 +1552,11 @@
 
   <script>
     // ── State ──────────────────────────────────────────────────────────────────
-    const data = { kpis: null, productos: [], ventas: [], clientes: [] };
-    const TITLES = { dashboard: 'Dashboard', productos: 'Productos', ventas: 'Pedidos', clientes: 'Clientes' };
+    const data = { kpis: null, productos: [], ventas: [], clientes: [], cotizaciones: [] };
+    const TITLES = { dashboard: 'Dashboard', productos: 'Productos', ventas: 'Pedidos', clientes: 'Clientes', cotizaciones: 'Cotizaciones' };
     let cur = 'dashboard';
-    let activePedido = null; // pedido abierto en el modal
+    let activePedido = null;
+    let activeCot    = null;
 
     // ── Navigation ─────────────────────────────────────────────────────────────
     function navigate(sec, el) {
@@ -1488,10 +1577,11 @@
 
     // ── Fetch ──────────────────────────────────────────────────────────────────
     async function load(sec) {
-      if (sec === 'dashboard') { await Promise.all([fetchKpis(), fetchVentas()]); }
-      else if (sec === 'productos') { await fetchProductos(); }
-      else if (sec === 'ventas') { await fetchVentas(); }
-      else if (sec === 'clientes') { await fetchClientes(); }
+      if (sec === 'dashboard')      { await Promise.all([fetchKpis(), fetchVentas()]); }
+      else if (sec === 'productos')     { await fetchProductos(); }
+      else if (sec === 'ventas')        { await fetchVentas(); }
+      else if (sec === 'clientes')      { await fetchClientes(); }
+      else if (sec === 'cotizaciones')  { await fetchCotizaciones(); }
     }
 
     async function fetchKpis() {
@@ -1526,7 +1616,7 @@
     async function refresh() {
       const icon = document.getElementById('refresh-icon');
       icon.classList.add('spinning');
-      Object.assign(data, { kpis: null, productos: [], ventas: [], clientes: [] });
+      Object.assign(data, { kpis: null, productos: [], ventas: [], clientes: [], cotizaciones: [] });
       await load(cur);
       setTimeout(() => icon.classList.remove('spinning'), 600);
       lucide.createIcons();
@@ -1630,7 +1720,7 @@
       if (e.target === document.getElementById('modal-overlay')) closeModal();
     }
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    // keydown Escape manejado en bloque de cotizaciones
 
     async function guardarEstado() {
       if (!activePedido) return;
@@ -1810,6 +1900,164 @@
       </div>
     </div>`).join('');
       lucide.createIcons();
+    }
+
+    // ── Cotizaciones ───────────────────────────────────────────────────────────
+    async function fetchCotizaciones() {
+      try {
+        data.cotizaciones = await (await fetch('/api/dashboard/cotizaciones')).json();
+        renderCotizaciones();
+      } catch (e) { console.error(e); }
+    }
+
+    function tipoBadge(t) {
+      const icons = { imagen:'image', pdf:'file', word:'file-text', texto:'message-square' };
+      return `<span class="tipo-badge"><i data-lucide="${icons[t]||'file'}" style="width:10px;height:10px"></i>${t}</span>`;
+    }
+
+    function cotEstadoBadge(e) {
+      if (e==='Recibida')   return `<span class="badge badge-amber">Recibida</span>`;
+      if (e==='Revisada')   return `<span class="badge badge-blue">Revisada</span>`;
+      if (e==='Respondida') return `<span class="badge badge-green">Respondida</span>`;
+      if (e==='Cerrada')    return `<span class="badge badge-slate">Cerrada</span>`;
+      return `<span class="badge badge-slate">${e}</span>`;
+    }
+
+    function renderCotizaciones() {
+      const tbody = document.getElementById('tbody-cot');
+      const q = (document.getElementById('q-cot').value || '').toLowerCase();
+      let list = data.cotizaciones;
+      if (q) list = list.filter(c =>
+        (c.descripcion||'').toLowerCase().includes(q) ||
+        (c.clienteWhatsapp||'').toLowerCase().includes(q) ||
+        (c.estado||'').toLowerCase().includes(q)
+      );
+      document.getElementById('cnt-cot').textContent = list.length;
+      if (!list.length) { tbody.innerHTML = `<tr><td colspan="6" class="empty">Sin cotizaciones registradas</td></tr>`; return; }
+      tbody.innerHTML = list.map(c => `
+        <tr class="row-clickable" onclick="openCotModal(data.cotizaciones.find(x=>x.id===${c.id}))">
+          <td style="color:var(--text-muted);white-space:nowrap">${c.fecha||'—'}</td>
+          <td><a href="https://wa.me/${c.clienteWhatsapp}" target="_blank" class="wa-link" onclick="event.stopPropagation()"><i data-lucide="message-circle" class="icon"></i>${c.clienteWhatsapp||'—'}</a></td>
+          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.descripcion}">${c.descripcion||'—'}</td>
+          <td>${tipoBadge(c.tipo)}</td>
+          <td><span class="badge badge-slate">${(c.productos||[]).length} items</span></td>
+          <td>${cotEstadoBadge(c.estado)}</td>
+        </tr>`).join('');
+      lucide.createIcons();
+    }
+
+    async function openCotModal(cot) {
+      if (!cot) return;
+      activeCot = cot;
+
+      document.getElementById('cot-title').textContent = cot.descripcion || 'Cotización #' + cot.id;
+      document.getElementById('cot-meta').innerHTML =
+        `<span><i data-lucide="calendar" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.fecha||'—'}</span>
+         <span><i data-lucide="message-circle" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.clienteWhatsapp||'—'}</span>
+         <span>${tipoBadge(cot.tipo)}</span>`;
+      document.getElementById('cot-desc').textContent = cot.descripcion || '—';
+      document.getElementById('cot-status').value = cot.estado || 'Recibida';
+      document.getElementById('cot-feedback').className = 'save-feedback';
+      document.getElementById('cot-feedback').textContent = '';
+      document.getElementById('cot-save-btn').disabled = false;
+      document.getElementById('cot-table-wrap').innerHTML =
+        `<div class="cot-loading"><i data-lucide="loader" style="width:20px;height:20px;animation:spin .8s linear infinite"></i><div style="margin-top:8px">Cargando comparativa…</div></div>`;
+
+      document.getElementById('modal-cot-overlay').classList.add('open');
+      lucide.createIcons();
+
+      // Cargar comparativa
+      try {
+        const comp = await (await fetch(`/api/dashboard/cotizaciones/${cot.id}/comparativa`)).json();
+        renderComparativa(comp);
+      } catch (e) {
+        document.getElementById('cot-table-wrap').innerHTML = `<div class="cot-loading">Error cargando comparativa</div>`;
+      }
+      lucide.createIcons();
+    }
+
+    function renderComparativa(comp) {
+      if (!comp || !comp.length) {
+        document.getElementById('cot-table-wrap').innerHTML = `<div class="cot-loading">Sin productos identificados en esta cotización</div>`;
+        return;
+      }
+      const rows = comp.map(item => {
+        const c = item.cotizado;
+        const k = item.catalogo;
+        const margenHtml = k && k.margen !== null
+          ? `<span class="${k.margen >= 30 ? 'margen-ok' : k.margen >= 15 ? 'margen-warn' : 'margen-low'}">${k.margen}%</span>`
+          : '<span style="color:var(--text-muted);font-size:11px">—</span>';
+        return `<tr>
+          <td style="font-weight:500">${c.nombre}</td>
+          <td class="tr">${c.cantidad}</td>
+          <td class="tr">${c.precio_cotizado ? clp(c.precio_cotizado) : '—'}</td>
+          <td>${k ? k.nombre : '<span class="muted">Sin match</span>'}</td>
+          <td class="tr">${k ? k.stock : '—'}</td>
+          <td class="tr">${k && k.precioCompra ? clp(k.precioCompra) : '—'}</td>
+          <td class="tr">${k && k.precioVenta ? clp(k.precioVenta) : '—'}</td>
+          <td style="text-align:center">${margenHtml}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('cot-table-wrap').innerHTML = `
+        <table class="cot-table">
+          <thead><tr>
+            <th>Producto cotizado</th>
+            <th class="tr">Cant.</th>
+            <th class="tr">Precio cot.</th>
+            <th>Match catálogo</th>
+            <th class="tr">Stock</th>
+            <th class="tr">Precio compra</th>
+            <th class="tr">Precio venta</th>
+            <th style="text-align:center">Margen</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    function closeCotModal() {
+      document.getElementById('modal-cot-overlay').classList.remove('open');
+      activeCot = null;
+    }
+
+    function closeCotModalOnBg(e) {
+      if (e.target === document.getElementById('modal-cot-overlay')) closeCotModal();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeModal(); closeCotModal(); }
+    });
+
+    async function guardarEstadoCot() {
+      if (!activeCot) return;
+      const estado = document.getElementById('cot-status').value;
+      const btn    = document.getElementById('cot-save-btn');
+      const fb     = document.getElementById('cot-feedback');
+      btn.disabled = true;
+      btn.textContent = 'Guardando…';
+      try {
+        const r = await fetch(`/api/dashboard/cotizaciones/${activeCot.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estado }),
+        });
+        const res = await r.json();
+        if (res.ok) {
+          const c = data.cotizaciones.find(x => x.id === activeCot.id);
+          if (c) { c.estado = estado; activeCot.estado = estado; }
+          renderCotizaciones();
+          fb.className = 'save-feedback ok';
+          fb.textContent = '✓ Guardado';
+        } else {
+          fb.className = 'save-feedback err';
+          fb.textContent = res.mensaje || 'Error';
+        }
+      } catch {
+        fb.className = 'save-feedback err';
+        fb.textContent = 'Error de conexión';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Guardar estado';
     }
 
     // ── Boot ───────────────────────────────────────────────────────────────────

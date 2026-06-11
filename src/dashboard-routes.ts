@@ -115,4 +115,85 @@ router.get("/api/dashboard/clientes", requireAuth, async (_req, res) => {
   })));
 });
 
+// ── Cotizaciones ──────────────────────────────────────────────────────────────
+
+router.get("/api/dashboard/cotizaciones", requireAuth, async (_req, res) => {
+  const { rows } = await pool.query(
+    `SELECT id, fecha, cliente_whatsapp, tipo, descripcion,
+            productos_json, estado
+     FROM cotizaciones
+     ORDER BY id DESC`
+  );
+  res.json(rows.map((c) => ({
+    id:              Number(c.id),
+    fecha:           String(c.fecha ?? ""),
+    clienteWhatsapp: String(c.cliente_whatsapp ?? ""),
+    tipo:            String(c.tipo ?? "texto"),
+    descripcion:     String(c.descripcion ?? ""),
+    productos:       c.productos_json ?? [],
+    estado:          String(c.estado ?? "Recibida"),
+  })));
+});
+
+router.patch("/api/dashboard/cotizaciones/:id", requireAuth, async (req, res) => {
+  const id     = parseInt(req.params.id, 10);
+  const estado = String((req.body as Record<string, unknown>).estado ?? "").trim();
+  const ESTADOS = ["Recibida", "Revisada", "Respondida", "Cerrada"];
+  if (!ESTADOS.includes(estado)) {
+    res.status(400).json({ ok: false, mensaje: "Estado no válido" });
+    return;
+  }
+  const { rowCount } = await pool.query(
+    `UPDATE cotizaciones SET estado = $1 WHERE id = $2`, [estado, id]
+  );
+  if (rowCount === 0) { res.status(404).json({ ok: false, mensaje: "No encontrada" }); return; }
+  res.json({ ok: true, estado });
+});
+
+// Comparativa: productos de la cotización vs catálogo (stock, precio_compra, precio_venta, margen)
+router.get("/api/dashboard/cotizaciones/:id/comparativa", requireAuth, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const { rows: cotRows } = await pool.query(
+    `SELECT productos_json FROM cotizaciones WHERE id = $1`, [id]
+  );
+  if (!cotRows[0]) { res.status(404).json({ error: "No encontrada" }); return; }
+
+  const productos: Array<{ nombre: string; cantidad: number; precio_cotizado: number }> =
+    cotRows[0].productos_json ?? [];
+
+  // Para cada producto de la cotización buscar el más similar en catálogo
+  const comparativa = await Promise.all(
+    productos.map(async (p) => {
+      const q = `%${p.nombre.split(" ")[0]}%`;
+      const { rows } = await pool.query(
+        `SELECT id, nombre, stock, precio, precio_compra
+         FROM productos
+         WHERE nombre ILIKE $1
+         ORDER BY nombre
+         LIMIT 1`,
+        [q]
+      );
+      const match = rows[0] ?? null;
+      const precioVenta  = match ? Number(match.precio)        : null;
+      const precioCompra = match ? Number(match.precio_compra) : null;
+      const margen = precioVenta && precioCompra && precioCompra > 0
+        ? Math.round(((precioVenta - precioCompra) / precioCompra) * 100)
+        : null;
+      return {
+        cotizado: p,
+        catalogo: match ? {
+          id:            match.id,
+          nombre:        match.nombre,
+          stock:         Number(match.stock),
+          precioVenta,
+          precioCompra,
+          margen,
+        } : null,
+      };
+    })
+  );
+
+  res.json(comparativa);
+});
+
 export default router;
