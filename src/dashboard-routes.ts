@@ -226,4 +226,13 @@ router.get("/api/dashboard/cotizaciones/:id/comparativa", requireAuth, async (re
   res.json(comparativa);
 });
 
+// ── Dev: token stats ─────────────────────────────────────────────────────────
+router.get("/api/dashboard/tokens", requireAuth, (_req, res) => {
+  const { getResumen } = require("./token-tracker");
+  res.json({
+    devMode: process.env.DEV_TOOLS === "true",
+    ...getResumen(),
+  });
+});
+
 export default router;

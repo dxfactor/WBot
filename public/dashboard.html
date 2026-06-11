@@ -1140,6 +1140,48 @@
     .cot-foot { padding: 14px 24px; border-top: 1px solid var(--border); background: var(--bg); border-radius: 0 0 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .cot-loading { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
     .tipo-badge { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--accent-light);color:var(--accent); }
+
+    /* ── Dev panel ─────────────────────────────────────────────────────────── */
+    .dev-grid    { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px; }
+    .dev-card    { background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow); }
+    .dev-card-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:6px; }
+    .dev-card-title .icon { width:14px;height:14px; }
+    .dev-badge-dev { display:inline-flex;align-items:center;gap:4px;background:#1e1b4b;color:#a5b4fc;border:1px solid #3730a3;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase; }
+
+    .tok-row { display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px; }
+    .tok-row:last-child { border-bottom:none; }
+    .tok-label { color:var(--text-muted); }
+    .tok-val   { font-family:'DM Mono',monospace;font-weight:600;font-size:12px;color:var(--text); }
+    .tok-val.cost { color:#7c3aed; }
+    .tok-val.clp  { color:var(--green); }
+
+    .price-table { width:100%;border-collapse:collapse;font-size:12px; }
+    .price-table th { text-align:left;padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border); }
+    .price-table th:last-child,.price-table td:last-child { text-align:right; }
+    .price-table td { padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text); }
+    .price-table tr:last-child td { border-bottom:none; }
+    .price-table td:last-child { font-family:'DM Mono',monospace;font-size:11px; }
+
+    .calc-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
+    .calc-field label { display:block;font-size:10.5px;font-weight:600;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em; }
+    .calc-input { width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);background:var(--bg);outline:none;transition:border-color .12s; }
+    .calc-input:focus { border-color:var(--accent); }
+    .calc-result { display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border); }
+    .calc-res-item { text-align:center; }
+    .calc-res-label { font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px; }
+    .calc-res-val   { font-family:'DM Mono',monospace;font-size:16px;font-weight:700; }
+    .calc-res-val.usd { color:#7c3aed; }
+    .calc-res-val.clp { color:var(--green); }
+
+    .usr-table { width:100%;border-collapse:collapse;font-size:12px; }
+    .usr-table th { text-align:left;padding:7px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border); }
+    .usr-table th:not(:first-child),.usr-table td:not(:first-child) { text-align:right; }
+    .usr-table td { padding:9px 12px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px; }
+    .usr-table tr:last-child td { border-bottom:none; }
+    .usr-table tr:hover td { background:var(--bg); }
+    .usr-table td:first-child { font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500; }
+
+    .session-badge { font-size:10px;color:var(--amber);background:var(--amber-light);border:1px solid #fde68a;padding:2px 8px;border-radius:20px;font-weight:600; }
   </style>
 </head>
 
@@ -1214,6 +1256,11 @@
       </a>
       <a class="nav-item" onclick="navigate('cotizaciones',this)">
         <i data-lucide="file-text" class="icon"></i>Cotizaciones
+      </a>
+
+      <div class="nav-label" id="nav-dev-label" style="display:none">Desarrollador</div>
+      <a class="nav-item" id="nav-dev" onclick="navigate('dev',this)" style="display:none">
+        <i data-lucide="cpu" class="icon"></i>Token Cost
       </a>
     </nav>
 
@@ -1422,6 +1469,118 @@
         </div>
       </div>
 
+      <!-- ─── DEV: TOKEN COST ──────────────────────────────────────────────── -->
+      <div class="section" id="sec-dev">
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <span class="dev-badge-dev"><i data-lucide="cpu" style="width:10px;height:10px"></i> DEV MODE</span>
+          <span style="font-size:12px;color:var(--text-muted)">Datos en memoria — se resetean al reiniciar el servidor</span>
+          <span class="session-badge" id="dev-fecha">—</span>
+        </div>
+
+        <!-- Resumen sesión + Precios -->
+        <div class="dev-grid">
+
+          <div class="dev-card">
+            <div class="dev-card-title"><i data-lucide="activity" class="icon"></i>Sesión actual</div>
+            <div class="tok-row"><span class="tok-label">Tokens input</span><span class="tok-val" id="d-in">—</span></div>
+            <div class="tok-row"><span class="tok-label">Tokens output</span><span class="tok-val" id="d-out">—</span></div>
+            <div class="tok-row"><span class="tok-label">Cache writes</span><span class="tok-val" id="d-cw">—</span></div>
+            <div class="tok-row"><span class="tok-label">Cache reads (hits)</span><span class="tok-val" id="d-cr">—</span></div>
+            <div class="tok-row"><span class="tok-label">Llamadas API</span><span class="tok-val" id="d-calls">—</span></div>
+            <div class="tok-row" style="margin-top:6px;border-top:2px solid var(--border);padding-top:10px">
+              <span class="tok-label" style="font-weight:600">Costo USD</span>
+              <span class="tok-val cost" id="d-usd">—</span>
+            </div>
+            <div class="tok-row">
+              <span class="tok-label" style="font-weight:600">Costo CLP <span id="tc-rate-label" style="font-weight:400;font-size:10px">(950)</span></span>
+              <span class="tok-val clp" id="d-clp">—</span>
+            </div>
+          </div>
+
+          <div class="dev-card">
+            <div class="dev-card-title"><i data-lucide="tag" class="icon"></i>Precios modelo — claude-opus-4-7</div>
+            <table class="price-table">
+              <thead><tr><th>Tipo</th><th>USD / M tokens</th></tr></thead>
+              <tbody id="price-table-body"></tbody>
+            </table>
+            <div style="margin-top:14px">
+              <div class="dev-card-title" style="margin-bottom:10px"><i data-lucide="refresh-cw" class="icon"></i>Tipo de cambio</div>
+              <div class="calc-field">
+                <label>CLP por 1 USD</label>
+                <input class="calc-input" type="number" id="tc-rate" value="950" min="1" oninput="recalcAll()">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Calculadora interactiva -->
+        <div class="dev-card" style="margin-bottom:16px">
+          <div class="dev-card-title"><i data-lucide="calculator" class="icon"></i>Calculadora de costo por conversación</div>
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label>Tokens input</label>
+              <input class="calc-input" type="number" id="ci-in" value="10000" oninput="calcular()">
+            </div>
+            <div class="calc-field">
+              <label>Tokens output</label>
+              <input class="calc-input" type="number" id="ci-out" value="1500" oninput="calcular()">
+            </div>
+            <div class="calc-field">
+              <label>Cache writes</label>
+              <input class="calc-input" type="number" id="ci-cw" value="2000" oninput="calcular()">
+            </div>
+            <div class="calc-field">
+              <label>Cache reads (hits)</label>
+              <input class="calc-input" type="number" id="ci-cr" value="2000" oninput="calcular()">
+            </div>
+          </div>
+          <div class="calc-result">
+            <div class="calc-res-item">
+              <div class="calc-res-label">Costo USD</div>
+              <div class="calc-res-val usd" id="calc-usd">$0.0000</div>
+            </div>
+            <div class="calc-res-item">
+              <div class="calc-res-label">Costo CLP</div>
+              <div class="calc-res-val clp" id="calc-clp">$0</div>
+            </div>
+            <div class="calc-res-item">
+              <div class="calc-res-label">100 conv / mes USD</div>
+              <div class="calc-res-val usd" id="calc-100-usd">$0.00</div>
+            </div>
+            <div class="calc-res-item">
+              <div class="calc-res-label">100 conv / mes CLP</div>
+              <div class="calc-res-val clp" id="calc-100-clp">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Por usuario -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Consumo por usuario — sesión actual</span>
+            <span class="count-pill" id="d-users-count">—</span>
+          </div>
+          <table class="usr-table">
+            <thead><tr>
+              <th>Usuario (WA)</th>
+              <th>Llamadas</th>
+              <th>Input tok</th>
+              <th>Output tok</th>
+              <th>Cache R</th>
+              <th>Total tok</th>
+              <th>USD</th>
+              <th>CLP</th>
+            </tr></thead>
+            <tbody id="usr-tbody">
+              <tr><td colspan="8" class="empty">Sin datos de sesión</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
     </div><!-- /content -->
   </main>
 
@@ -1572,7 +1731,8 @@
 
     function loaded(sec) {
       if (sec === 'dashboard') return data.kpis !== null;
-      return data[sec].length > 0;
+      if (sec === 'dev')       return tokenData !== null;
+      return (data[sec] || []).length > 0;
     }
 
     // ── Fetch ──────────────────────────────────────────────────────────────────
@@ -1582,6 +1742,7 @@
       else if (sec === 'ventas')        { await fetchVentas(); }
       else if (sec === 'clientes')      { await fetchClientes(); }
       else if (sec === 'cotizaciones')  { await fetchCotizaciones(); }
+      else if (sec === 'dev')           { await fetchTokens(); }
     }
 
     async function fetchKpis() {
@@ -1617,6 +1778,7 @@
       const icon = document.getElementById('refresh-icon');
       icon.classList.add('spinning');
       Object.assign(data, { kpis: null, productos: [], ventas: [], clientes: [], cotizaciones: [] });
+      tokenData = null;
       await load(cur);
       setTimeout(() => icon.classList.remove('spinning'), 600);
       lucide.createIcons();
@@ -2075,9 +2237,101 @@
       btn.textContent = 'Guardar estado';
     }
 
+    // ── Dev: Token Cost Calculator ────────────────────────────────────────────
+    let tokenData = null;
+
+    const TITLES_EXT = Object.assign(TITLES, { dev: 'Token Cost — Dev' });
+
+    async function fetchTokens() {
+      try {
+        tokenData = await (await fetch('/api/dashboard/tokens')).json();
+        if (tokenData.devMode) {
+          document.getElementById('nav-dev-label').style.display = '';
+          document.getElementById('nav-dev').style.display = '';
+        }
+        renderDev();
+      } catch (e) { console.error(e); }
+    }
+
+    function getRate() { return parseFloat(document.getElementById('tc-rate')?.value || '950') || 950; }
+
+    function fmtTok(n)  { return Number(n || 0).toLocaleString('es-CL'); }
+    function fmtUSD(n)  { return '$' + Number(n || 0).toFixed(4); }
+    function fmtCLP(n, rate) { return '$' + Math.round(Number(n || 0) * rate).toLocaleString('es-CL'); }
+
+    function renderDev() {
+      if (!tokenData) return;
+      const rate = getRate();
+      const t = tokenData.total || {};
+
+      document.getElementById('dev-fecha').textContent    = tokenData.fecha || '—';
+      document.getElementById('d-in').textContent         = fmtTok(t.inputTokens);
+      document.getElementById('d-out').textContent        = fmtTok(t.outputTokens);
+      document.getElementById('d-cw').textContent         = fmtTok(t.cacheWriteTokens);
+      document.getElementById('d-cr').textContent         = fmtTok(t.cacheReadTokens);
+      document.getElementById('d-calls').textContent      = t.llamadas || 0;
+      document.getElementById('d-usd').textContent        = fmtUSD(t.costoUSD);
+      document.getElementById('d-clp').textContent        = fmtCLP(t.costoUSD, rate);
+      document.getElementById('tc-rate-label').textContent = `(${rate})`;
+
+      // Precios
+      const p = tokenData.precios_usd_por_millon || {};
+      const priceRows = [
+        ['Input tokens',       p.input,      '#6366f1'],
+        ['Output tokens',      p.output,     '#ef4444'],
+        ['Cache write tokens', p.cacheWrite, '#f59e0b'],
+        ['Cache read tokens',  p.cacheRead,  '#10b981'],
+      ];
+      document.getElementById('price-table-body').innerHTML = priceRows.map(([label, val, color]) =>
+        `<tr><td>${label}</td><td style="color:${color};font-weight:700">$${val}</td></tr>`
+      ).join('');
+
+      // Usuarios
+      const users = tokenData.usuariosActivos || [];
+      document.getElementById('d-users-count').textContent = users.length;
+      if (!users.length) {
+        document.getElementById('usr-tbody').innerHTML = `<tr><td colspan="8" class="empty">Sin actividad en esta sesión</td></tr>`;
+      } else {
+        document.getElementById('usr-tbody').innerHTML = users.map(u => {
+          const total = (u.inputTokens||0) + (u.outputTokens||0);
+          return `<tr>
+            <td>${u.usuario}</td>
+            <td>${u.llamadas||0}</td>
+            <td>${fmtTok(u.inputTokens)}</td>
+            <td>${fmtTok(u.outputTokens)}</td>
+            <td>${fmtTok(u.cacheReadTokens)}</td>
+            <td style="font-weight:600">${fmtTok(total)}</td>
+            <td style="color:#7c3aed">${fmtUSD(u.costoUSD)}</td>
+            <td style="color:var(--green)">${fmtCLP(u.costoUSD, rate)}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      calcular();
+    }
+
+    function calcular() {
+      if (!tokenData) return;
+      const p   = tokenData.precios_usd_por_millon || { input:15, output:75, cacheWrite:18.75, cacheRead:1.875 };
+      const rate = getRate();
+      const tin  = parseFloat(document.getElementById('ci-in')?.value  || '0') || 0;
+      const tout = parseFloat(document.getElementById('ci-out')?.value || '0') || 0;
+      const tcw  = parseFloat(document.getElementById('ci-cw')?.value  || '0') || 0;
+      const tcr  = parseFloat(document.getElementById('ci-cr')?.value  || '0') || 0;
+
+      const usd = (tin * p.input + tout * p.output + tcw * p.cacheWrite + tcr * p.cacheRead) / 1_000_000;
+
+      document.getElementById('calc-usd').textContent     = fmtUSD(usd);
+      document.getElementById('calc-clp').textContent     = fmtCLP(usd, rate);
+      document.getElementById('calc-100-usd').textContent = '$' + (usd * 100).toFixed(2);
+      document.getElementById('calc-100-clp').textContent = '$' + Math.round(usd * 100 * rate).toLocaleString('es-CL');
+    }
+
+    function recalcAll() { renderDev(); }
+
     // ── Boot ───────────────────────────────────────────────────────────────────
     lucide.createIcons();
-    checkAuth();
+    checkAuth().then(() => fetchTokens()); // detectar devMode al cargar
   </script>
 </body>
 
