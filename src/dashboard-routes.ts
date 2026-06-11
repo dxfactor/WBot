@@ -119,19 +119,22 @@ router.get("/api/dashboard/clientes", requireAuth, async (_req, res) => {
 
 router.get("/api/dashboard/cotizaciones", requireAuth, async (_req, res) => {
   const { rows } = await pool.query(
-    `SELECT id, fecha, cliente_whatsapp, tipo, descripcion,
-            productos_json, estado
+    `SELECT id, fecha, cliente_whatsapp, cliente_nombre, cliente_telefono,
+            cliente_email, tipo, descripcion, productos_json, estado
      FROM cotizaciones
      ORDER BY id DESC`
   );
   res.json(rows.map((c) => ({
     id:              Number(c.id),
-    fecha:           String(c.fecha ?? ""),
+    fecha:           String(c.fecha          ?? ""),
     clienteWhatsapp: String(c.cliente_whatsapp ?? ""),
-    tipo:            String(c.tipo ?? "texto"),
-    descripcion:     String(c.descripcion ?? ""),
-    productos:       c.productos_json ?? [],
-    estado:          String(c.estado ?? "Recibida"),
+    clienteNombre:   String(c.cliente_nombre   ?? ""),
+    clienteTelefono: String(c.cliente_telefono ?? ""),
+    clienteEmail:    String(c.cliente_email    ?? ""),
+    tipo:            String(c.tipo             ?? "texto"),
+    descripcion:     String(c.descripcion      ?? ""),
+    productos:       c.productos_json          ?? [],
+    estado:          String(c.estado           ?? "Recibida"),
   })));
 });
 
@@ -150,7 +153,7 @@ router.patch("/api/dashboard/cotizaciones/:id", requireAuth, async (req, res) =>
   res.json({ ok: true, estado });
 });
 
-// Comparativa: productos de la cotización vs catálogo (stock, precio_compra, precio_venta, margen)
+// Comparativa enriquecida usando id_catalogo guardado por el agente IA
 router.get("/api/dashboard/cotizaciones/:id/comparativa", requireAuth, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const { rows: cotRows } = await pool.query(
@@ -158,33 +161,60 @@ router.get("/api/dashboard/cotizaciones/:id/comparativa", requireAuth, async (re
   );
   if (!cotRows[0]) { res.status(404).json({ error: "No encontrada" }); return; }
 
-  const productos: Array<{ nombre: string; cantidad: number; precio_cotizado: number }> =
-    cotRows[0].productos_json ?? [];
+  type ProdCot = {
+    nombre_cotizado: string;
+    cantidad: number;
+    id_catalogo?: string;
+    nombre_catalogo?: string;
+    es_alternativa?: boolean;
+    nota?: string;
+    // legado (cotizaciones antiguas sin estructura nueva)
+    nombre?: string;
+    precio_cotizado?: number;
+  };
 
-  // Para cada producto de la cotización buscar el más similar en catálogo
+  const productos: ProdCot[] = cotRows[0].productos_json ?? [];
+
   const comparativa = await Promise.all(
     productos.map(async (p) => {
-      const q = `%${p.nombre.split(" ")[0]}%`;
-      const { rows } = await pool.query(
-        `SELECT id, nombre, stock, precio, precio_compra
-         FROM productos
-         WHERE nombre ILIKE $1
-         ORDER BY nombre
-         LIMIT 1`,
-        [q]
-      );
-      const match = rows[0] ?? null;
-      const precioVenta  = match ? Number(match.precio)        : null;
-      const precioCompra = match ? Number(match.precio_compra) : null;
+      let catRow = null;
+
+      // Buscar por id_catalogo si lo tiene (cotizaciones nuevas)
+      if (p.id_catalogo) {
+        const { rows } = await pool.query(
+          `SELECT id, nombre, stock, precio, precio_compra FROM productos WHERE id = $1`,
+          [p.id_catalogo]
+        );
+        catRow = rows[0] ?? null;
+      }
+
+      // Fallback: buscar por nombre_catalogo o nombre (cotizaciones antiguas)
+      if (!catRow) {
+        const buscar = p.nombre_catalogo ?? p.nombre_cotizado ?? p.nombre ?? "";
+        const q = `%${buscar.split(" ")[0]}%`;
+        const { rows } = await pool.query(
+          `SELECT id, nombre, stock, precio, precio_compra
+           FROM productos WHERE nombre ILIKE $1 ORDER BY nombre LIMIT 1`,
+          [q]
+        );
+        catRow = rows[0] ?? null;
+      }
+
+      const precioVenta  = catRow ? Number(catRow.precio)        : null;
+      const precioCompra = catRow ? Number(catRow.precio_compra) : null;
       const margen = precioVenta && precioCompra && precioCompra > 0
         ? Math.round(((precioVenta - precioCompra) / precioCompra) * 100)
         : null;
+
       return {
-        cotizado: p,
-        catalogo: match ? {
-          id:            match.id,
-          nombre:        match.nombre,
-          stock:         Number(match.stock),
+        nombreCotizado:  p.nombre_cotizado ?? p.nombre ?? "",
+        cantidad:        p.cantidad ?? 0,
+        esAlternativa:   p.es_alternativa ?? false,
+        nota:            p.nota ?? "",
+        catalogo: catRow ? {
+          id:            catRow.id,
+          nombre:        catRow.nombre,
+          stock:         Number(catRow.stock),
           precioVenta,
           precioCompra,
           margen,

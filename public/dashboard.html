@@ -1413,7 +1413,7 @@
           </div>
           <table>
             <thead><tr>
-              <th>Fecha</th><th>WhatsApp</th><th>Descripción</th><th>Tipo</th><th>Productos</th><th>Estado</th>
+              <th>Fecha</th><th>Cliente</th><th>Email</th><th>Descripción</th><th>Tipo</th><th>Items</th><th>Estado</th>
             </tr></thead>
             <tbody id="tbody-cot">
               <tr class="sk-row"><td colspan="6"><div class="skeleton"></div></td></tr>
@@ -1937,10 +1937,14 @@
       tbody.innerHTML = list.map(c => `
         <tr class="row-clickable" onclick="openCotModal(data.cotizaciones.find(x=>x.id===${c.id}))">
           <td style="color:var(--text-muted);white-space:nowrap">${c.fecha||'—'}</td>
-          <td><a href="https://wa.me/${c.clienteWhatsapp}" target="_blank" class="wa-link" onclick="event.stopPropagation()"><i data-lucide="message-circle" class="icon"></i>${c.clienteWhatsapp||'—'}</a></td>
-          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.descripcion}">${c.descripcion||'—'}</td>
+          <td>
+            <div style="font-weight:500">${c.clienteNombre||'—'}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${c.clienteWhatsapp||''}</div>
+          </td>
+          <td style="font-size:12px;color:var(--text-muted)">${c.clienteEmail||'—'}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.descripcion}">${c.descripcion||'—'}</td>
           <td>${tipoBadge(c.tipo)}</td>
-          <td><span class="badge badge-slate">${(c.productos||[]).length} items</span></td>
+          <td><span class="badge badge-slate">${(c.productos||[]).length}</span></td>
           <td>${cotEstadoBadge(c.estado)}</td>
         </tr>`).join('');
       lucide.createIcons();
@@ -1953,7 +1957,9 @@
       document.getElementById('cot-title').textContent = cot.descripcion || 'Cotización #' + cot.id;
       document.getElementById('cot-meta').innerHTML =
         `<span><i data-lucide="calendar" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.fecha||'—'}</span>
-         <span><i data-lucide="message-circle" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.clienteWhatsapp||'—'}</span>
+         <span><i data-lucide="user" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.clienteNombre||'—'}</span>
+         <span><i data-lucide="phone" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.clienteTelefono||cot.clienteWhatsapp||'—'}</span>
+         <span><i data-lucide="mail" style="width:12px;height:12px;vertical-align:-2px"></i> ${cot.clienteEmail||'—'}</span>
          <span>${tipoBadge(cot.tipo)}</span>`;
       document.getElementById('cot-desc').textContent = cot.descripcion || '—';
       document.getElementById('cot-status').value = cot.estado || 'Recibida';
@@ -1981,20 +1987,30 @@
         document.getElementById('cot-table-wrap').innerHTML = `<div class="cot-loading">Sin productos identificados en esta cotización</div>`;
         return;
       }
+
       const rows = comp.map(item => {
-        const c = item.cotizado;
         const k = item.catalogo;
         const margenHtml = k && k.margen !== null
           ? `<span class="${k.margen >= 30 ? 'margen-ok' : k.margen >= 15 ? 'margen-warn' : 'margen-low'}">${k.margen}%</span>`
           : '<span style="color:var(--text-muted);font-size:11px">—</span>';
+
+        const altBadge = item.esAlternativa
+          ? `<span class="badge badge-amber" style="font-size:9px;margin-left:4px">ALT</span>` : '';
+        const catNombre = k
+          ? `<span style="font-weight:500">${k.nombre}</span>${altBadge}${item.nota ? `<br><span style="font-size:10px;color:var(--text-muted)">${item.nota}</span>` : ''}`
+          : `<span style="color:var(--text-muted);font-style:italic;font-size:11px">Sin match en catálogo</span>`;
+
+        const stockHtml = k
+          ? `<span class="${k.stock > 5 ? 'badge badge-green' : k.stock > 0 ? 'badge badge-amber' : 'badge badge-red'}">${k.stock}</span>`
+          : '—';
+
         return `<tr>
-          <td style="font-weight:500">${c.nombre}</td>
-          <td class="tr">${c.cantidad}</td>
-          <td class="tr">${c.precio_cotizado ? clp(c.precio_cotizado) : '—'}</td>
-          <td>${k ? k.nombre : '<span class="muted">Sin match</span>'}</td>
-          <td class="tr">${k ? k.stock : '—'}</td>
+          <td style="font-weight:500">${item.nombreCotizado}</td>
+          <td class="tr">${item.cantidad}</td>
+          <td>${catNombre}</td>
+          <td style="text-align:center">${stockHtml}</td>
           <td class="tr">${k && k.precioCompra ? clp(k.precioCompra) : '—'}</td>
-          <td class="tr">${k && k.precioVenta ? clp(k.precioVenta) : '—'}</td>
+          <td class="tr">${k && k.precioVenta  ? clp(k.precioVenta)  : '—'}</td>
           <td style="text-align:center">${margenHtml}</td>
         </tr>`;
       }).join('');
@@ -2002,11 +2018,10 @@
       document.getElementById('cot-table-wrap').innerHTML = `
         <table class="cot-table">
           <thead><tr>
-            <th>Producto cotizado</th>
+            <th>Producto solicitado</th>
             <th class="tr">Cant.</th>
-            <th class="tr">Precio cot.</th>
-            <th>Match catálogo</th>
-            <th class="tr">Stock</th>
+            <th>Producto en catálogo</th>
+            <th style="text-align:center">Stock</th>
             <th class="tr">Precio compra</th>
             <th class="tr">Precio venta</th>
             <th style="text-align:center">Margen</th>
