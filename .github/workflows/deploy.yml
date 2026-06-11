@@ -55,10 +55,11 @@ jobs:
               WHATSAPP_PHONE_NUMBER_ID=${{ secrets.WHATSAPP_PHONE_NUMBER_ID }},\
               WHATSAPP_VERIFY_TOKEN=${{ secrets.WHATSAPP_VERIFY_TOKEN }},\
               VENDEDOR_PHONE=${{ secrets.VENDEDOR_PHONE }},\
-              BUSINESS_NAME=Ferretería Tarugo,\
+              BUSINESS_NAME=Conecta AI,\
               SESSION_SECRET=${{ secrets.SESSION_SECRET }},\
               DASHBOARD_USER=${{ secrets.DASHBOARD_USER }},\
               DASHBOARD_PASS=${{ secrets.DASHBOARD_PASS }},\
+              DEV_TOOLS=false,\
               PORT=8080" \
             --set-secrets "WHATSAPP_ACCESS_TOKEN=WHATSAPP_ACCESS_TOKEN:latest,\
               ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,\
