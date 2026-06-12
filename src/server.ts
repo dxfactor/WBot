@@ -14,7 +14,19 @@ import dashboardRoutes from "./dashboard-routes";
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../public")));
+
+// Servir archivos estáticos desde public/
+const publicPath = path.resolve(__dirname, "../public");
+app.use(express.static(publicPath));
+
+// Rutas explícitas para dashboards
+app.get("/cotizaciones-dashboard.html", (_req, res) => {
+  const filePath = path.resolve(publicPath, "cotizaciones-dashboard.html");
+  console.log(`[server] Sirviendo ${filePath}`);
+  res.sendFile(filePath, (err) => {
+    if (err) console.error("[server] Error sirviendo archivo:", err);
+  });
+});
 
 app.use(session({
   secret:            process.env.SESSION_SECRET ?? "tarugo-secret-2026",

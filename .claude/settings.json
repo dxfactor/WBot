@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(curl -s -o /dev/null -w \"Webhook status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/webhook)"
+      "Bash(curl -s -o /dev/null -w \"Webhook status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/webhook)",
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"Dashboard status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
+      "Bash(docker run *)",
+      "Bash(curl -s -o /dev/null -w \"dashboard.html status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"hotel-dashboard.html status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/hotel-dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"cotizaciones-dashboard.html status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
+      "Bash(curl -s https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)"
     ]
   }
 }
