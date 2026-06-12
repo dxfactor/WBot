@@ -56,7 +56,23 @@
       "Bash(gsutil cp *)",
       "Bash(gcloud components *)",
       "Bash(gsutil iam *)",
-      "Bash(git commit -m 'feat: agregar flujo de cotizaciones con confirmación por email *)"
+      "Bash(git commit -m 'feat: agregar flujo de cotizaciones con confirmación por email *)",
+      "Bash(git commit *)",
+      "Bash(gh workflow *)",
+      "Bash(curl -s \"https://api.github.com/repos/dxfactor/WBot/actions/runs?branch=main\" -H \"Accept: application/vnd.github+json\")",
+      "Bash(curl -s \"https://api.github.com/repos/dxfactor/WBot/actions/runs/27386983747/jobs\" -H \"Accept: application/vnd.github+json\")",
+      "Bash(curl -s \"https://api.github.com/repos/dxfactor/WBot/actions/runs/27386983747/logs\" -H \"Accept: application/vnd.github+json\" -L)",
+      "Bash(curl -s \"https://api.github.com/repos/dxfactor/WBot/actions/runs?branch=main&per_page=5\" -H \"Accept: application/vnd.github+json\")",
+      "Bash(gcloud secrets *)",
+      "Bash(grep -v \"^NAME$\")",
+      "Bash(curl -s https://wbot-932171584679.us-central1.run.app/webhook -X GET)",
+      "Bash(jq '.spec.template.spec.containers[0].env[] | {name: .name, value: .value}')",
+      "Bash(grep -E \"\\\\.ts$\")",
+      "Bash(DB_HOST=10.20.0.3 DB_PORT=5432 DB_DATABASE=WBot DB_USERNAME=postgres DB_PASSWORD=WBot@CloudSQL2024 npm run init-db)",
+      "Bash(cat > *)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
     ]
   }
 }

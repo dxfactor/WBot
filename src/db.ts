@@ -23,3 +23,21 @@ export const pool = new Pool(config);
 pool.on("error", (err) => {
   console.error("[db] Error inesperado en el pool:", err.message);
 });
+
+// Crear tabla de cotizaciones si no existe (compatibilidad con versiones anteriores)
+pool.query(`
+  CREATE TABLE IF NOT EXISTS cotizaciones (
+    id SERIAL PRIMARY KEY,
+    fecha TEXT,
+    cliente_whatsapp TEXT,
+    cliente_nombre TEXT,
+    tipo TEXT DEFAULT 'texto',
+    descripcion TEXT,
+    productos_json JSONB,
+    estado TEXT DEFAULT 'Recibida',
+    cliente_telefono TEXT,
+    cliente_email TEXT
+  );
+`).catch((err) => {
+  console.warn("[db] No se pudo crear tabla cotizaciones:", err.message);
+});
