@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { pool } from "./db";
 import { requireAuth } from "./auth-routes";
+import fs from "fs";
+import pathModule from "path";
 
 const router = Router();
 

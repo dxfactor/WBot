@@ -38,6 +38,19 @@ app.use(session({
 app.use(authRoutes);
 app.use(dashboardRoutes);
 
+// Dashboard de cotizaciones
+app.get("/cotizaciones", (_req, res) => {
+  const fs = require("fs");
+  const path = require("path");
+  const filePath = path.join(__dirname, "../public/cotizaciones-dashboard.html");
+  try {
+    const html = fs.readFileSync(filePath, "utf-8");
+    res.type("text/html").send(html);
+  } catch (err) {
+    res.status(500).send("<h1>Error cargando dashboard</h1>");
+  }
+});
+
 // ── Mensajes del menú ────────────────────────────────────────────────────────
 const businessName = process.env.BUSINESS_NAME ?? "Ferretería Tarugo";
 
