@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Cotizaciones - Ferretería Tarugo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    .filters {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filters select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .filters button {
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .filters button:hover {
+      background: #764ba2;
+    }
+
+    .cotizaciones-grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+
+    .cotizacion-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-left: 4px solid #667eea;
+    }
+
+    .cotizacion-card.pendiente { border-left-color: #ff9800; }
+    .cotizacion-card.revisada { border-left-color: #2196f3; }
+    .cotizacion-card.respondida { border-left-color: #4caf50; }
+    .cotizacion-card.cerrada { border-left-color: #999; }
+
+    .cot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 15px;
+    }
+
+    .cot-numero {
+      font-size: 18px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .cot-estado {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .cot-estado.pendiente { background: #ffe0b2; color: #e65100; }
+    .cot-estado.revisada { background: #bbdefb; color: #01579b; }
+    .cot-estado.respondida { background: #c8e6c9; color: #1b5e20; }
+    .cot-estado.cerrada { background: #eeeeee; color: #424242; }
+
+    .cot-cliente {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cot-cliente-nombre {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .cot-cliente-info {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .cot-fecha {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .productos-resumen {
+      margin-bottom: 15px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+
+    .productos-resumen-title {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .productos-list {
+      font-size: 13px;
+      line-height: 1.8;
+      color: #666;
+    }
+
+    .producto-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .ver-detalles {
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 12px;
+      color: #667eea;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .ver-detalles:hover {
+      background: #e8e8e8;
+    }
+
+    .acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .btn-revisar {
+      background: #2196f3;
+      color: white;
+    }
+
+    .btn-revisar:hover {
+      background: #1976d2;
+    }
+
+    .btn-rechazar {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-rechazar:hover {
+      background: #d32f2f;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      color: #333;
+    }
+
+    .close {
+      font-size: 28px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .close:hover {
+      color: #333;
+    }
+
+    .producto-detalle {
+      background: #f9f9f9;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      border-left: 3px solid #667eea;
+    }
+
+    .producto-detalle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .producto-detalle-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .producto-detalle-label {
+      font-weight: 600;
+      color: #667eea;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .producto-detalle-valor {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .margen-positivo {
+      color: #4caf50;
+      font-weight: 600;
+    }
+
+    .margen-negativo {
+      color: #f44336;
+      font-weight: 600;
+    }
+
+    .no-datos {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    .no-datos h2 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4caf50;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 2000;
+    }
+
+    .toast.error {
+      background: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📋 Dashboard de Cotizaciones</h1>
+  </header>
+
+  <div class="container">
+    <div class="filters">
+      <select id="filtroEstado">
+        <option value="">Todos los estados</option>
+        <option value="Recibida">Recibida</option>
+        <option value="Revisada">Revisada</option>
+        <option value="Respondida">Respondida</option>
+        <option value="Cerrada">Cerrada</option>
+      </select>
+      <button onclick="cargarCotizaciones()">🔄 Refrescar</button>
+    </div>
+
+    <div id="cotizacionesContainer" class="cotizaciones-grid"></div>
+  </div>
+
+  <!-- Modal de detalles -->
+  <div id="detallesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="detallesTitle">Detalles de Cotización</h2>
+        <span class="close" onclick="cerrarModal()">&times;</span>
+      </div>
+      <div id="detallesContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/dashboard';
+
+    async function cargarCotizaciones() {
+      const container = document.getElementById('cotizacionesContainer');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/cotizaciones`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const cotizaciones = await res.json();
+
+        const filtro = document.getElementById('filtroEstado').value;
+        const filtradas = filtro ? cotizaciones.filter(c => c.estado === filtro) : cotizaciones;
+
+        if (filtradas.length === 0) {
+          container.innerHTML = '<div class="no-datos"><h2>No hay cotizaciones</h2><p>No se encontraron cotizaciones con este filtro.</p></div>';
+          return;
+        }
+
+        container.innerHTML = filtradas.map(cot => `
+          <div class="cotizacion-card ${cot.estado.toLowerCase()}">
+            <div class="cot-header">
+              <div class="cot-numero">Cotización #${String(cot.id).padStart(4, '0')}</div>
+              <div class="cot-estado ${cot.estado.toLowerCase()}">${cot.estado}</div>
+            </div>
+
+            <div class="cot-cliente">
+              <div class="cot-cliente-nombre">${cot.clienteNombre}</div>
+              <div class="cot-cliente-info">
+                <div>📱 ${cot.clienteTelefono}</div>
+                <div>📧 ${cot.clienteEmail}</div>
+                <div class="cot-fecha">${new Date(cot.fecha).toLocaleString('es-CL')}</div>
+              </div>
+            </div>
+
+            <div class="productos-resumen">
+              <div class="productos-resumen-title">📦 Productos (${Array.isArray(cot.productos) ? cot.productos.length : 0})</div>
+              <div class="productos-list">
+                ${Array.isArray(cot.productos) ? cot.productos.slice(0, 3).map(p => `
+                  <div class="producto-item">
+                    <span>${p.nombre_cotizado || p.nombre}</span>
+                    <span>x${p.cantidad}</span>
+                  </div>
+                `).join('') : '<em>Sin información</em>'}
+                ${Array.isArray(cot.productos) && cot.productos.length > 3 ? `<div class="producto-item"><em>+${cot.productos.length - 3} más...</em></div>` : ''}
+              </div>
+            </div>
+
+            <div class="ver-detalles" onclick="verDetalles(${cot.id})">👁️ Ver detalles y margen</div>
+
+            ${cot.estado === 'Recibida' ? `
+              <div class="acciones">
+                <button class="btn btn-revisar" onclick="cambiarEstado(${cot.id}, 'Revisada')">✓ Revisar</button>
+              </div>
+            ` : cot.estado === 'Revisada' ? `
+              <div class="acciones">
+                <button class="btn btn-revisar" onclick="cambiarEstado(${cot.id}, 'Respondida')">✓ Respondida</button>
+                <button class="btn btn-rechazar" onclick="cambiarEstado(${cot.id}, 'Cerrada')">✗ Cerrar</button>
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+
+      } catch (error) {
+        container.innerHTML = `<div class="no-datos"><h2>Error</h2><p>${error.message}</p></div>`;
+        mostrarToast(`Error: ${error.message}`, true);
+      }
+    }
+
+    async function verDetalles(cotId) {
+      try {
+        const res = await fetch(`${API_BASE}/cotizaciones/${cotId}/comparativa`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const productos = await res.json();
+
+        const detallesContent = document.getElementById('detallesContent');
+        detallesContent.innerHTML = productos.map(p => `
+          <div class="producto-detalle">
+            <div style="font-weight: 600; margin-bottom: 10px;">
+              ${p.nombreCotizado}
+              ${p.esAlternativa ? '<span style="background: #fff3cd; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">ALTERNATIVA</span>' : ''}
+            </div>
+            ${p.nota ? `<div style="font-size: 12px; color: #666; margin-bottom: 8px;">ℹ️ ${p.nota}</div>` : ''}
+
+            ${p.catalogo ? `
+              <div class="producto-detalle-grid">
+                <div class="producto-detalle-item">
+                  <span class="producto-detalle-label">Cantidad</span>
+                  <span class="producto-detalle-valor">${p.cantidad}</span>
+                </div>
+                <div class="producto-detalle-item">
+                  <span class="producto-detalle-label">Producto</span>
+                  <span class="producto-detalle-valor">${p.catalogo.nombre}</span>
+                </div>
+                <div class="producto-detalle-item">
+                  <span class="producto-detalle-label">Stock</span>
+                  <span class="producto-detalle-valor">${p.catalogo.stock} unidades</span>
+                </div>
+                <div class="producto-detalle-item">
+                  <span class="producto-detalle-label">Precio Venta</span>
+                  <span class="producto-detalle-valor">$${p.catalogo.precioVenta.toLocaleString('es-CL')}</span>
+                </div>
+                <div class="producto-detalle-item">
+                  <span class="producto-detalle-label">Precio Compra</span>
+                  <span class="producto-detalle-valor">$${p.catalogo.precioCompra.toLocaleString('es-CL')}</span>
+                </div>
+                <div class="producto-detalle-item">
+                  <span class="producto-detalle-label">Margen</span>
+                  <span class="producto-detalle-valor ${p.catalogo.margen >= 0 ? 'margen-positivo' : 'margen-negativo'}">${p.catalogo.margen}%</span>
+                </div>
+              </div>
+            ` : `
+              <div style="color: #f44336; font-size: 13px; padding: 10px; background: #ffebee; border-radius: 4px;">
+                ⚠️ Producto no encontrado en catálogo
+              </div>
+            `}
+          </div>
+        `).join('');
+
+        document.getElementById('detallesTitle').textContent = `Detalles - Cotización #${String(cotId).padStart(4, '0')}`;
+        document.getElementById('detallesModal').classList.add('active');
+
+      } catch (error) {
+        mostrarToast(`Error: ${error.message}`, true);
+      }
+    }
+
+    function cerrarModal() {
+      document.getElementById('detallesModal').classList.remove('active');
+    }
+
+    async function cambiarEstado(cotId, nuevoEstado) {
+      try {
+        const res = await fetch(`${API_BASE}/cotizaciones/${cotId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estado: nuevoEstado })
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        mostrarToast(`✓ Cotización actualizada a "${nuevoEstado}"`);
+        cargarCotizaciones();
+
+      } catch (error) {
+        mostrarToast(`Error: ${error.message}`, true);
+      }
+    }
+
+    function mostrarToast(mensaje, esError = false) {
+      const toast = document.createElement('div');
+      toast.className = `toast ${esError ? 'error' : ''}`;
+      toast.textContent = mensaje;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Cargar al abrir
+    document.getElementById('filtroEstado').addEventListener('change', cargarCotizaciones);
+    cargarCotizaciones();
+
+    // Cerrar modal al hacer click afuera
+    document.getElementById('detallesModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('detallesModal')) cerrarModal();
+    });
+  </script>
+</body>
+</html>
