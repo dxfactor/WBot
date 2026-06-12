@@ -8,6 +8,7 @@ import {
   obtenerProductoPorId,
 } from "./catalog";
 import { registrarPedido, consultarPedido, actualizarPedido } from "./orders";
+import { registrarCotizacion } from "./cotizaciones";
 
 // Definiciones de herramientas que Claude puede invocar
 export const toolDefinitions: Anthropic.Tool[] = [
@@ -149,6 +150,24 @@ export const toolDefinitions: Anthropic.Tool[] = [
       required: ["cliente_nombre", "cliente_rut", "cliente_telefono", "cliente_direccion", "tipo_documento", "productos", "total", "whatsapp_cliente"],
     },
   },
+  {
+    name: "registrar_cotizacion",
+    description:
+      "Registra una cotización una vez que el cliente confirmó los productos y entregó sus datos (nombre, RUT, teléfono, email). Notifica al vendedor por WhatsApp y envía confirmación por correo al cliente. Úsalo SOLO cuando tengas todos estos datos: nombre, RUT, teléfono, email y los productos con cantidades.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        cliente_nombre: { type: "string", description: "Nombre completo del cliente" },
+        cliente_rut: { type: "string", description: "RUT del cliente (ej: 12.345.678-9)" },
+        cliente_telefono: { type: "string", description: "Teléfono de contacto del cliente" },
+        cliente_email: { type: "string", description: "Email del cliente para enviar confirmación" },
+        productos: { type: "string", description: "Descripción de la cotización: productos, cantidades y precios unitarios" },
+        total: { type: "number", description: "Total estimado en CLP (número entero)" },
+        whatsapp_cliente: { type: "string", description: "Número WhatsApp del cliente sin + (ej: 56912345678)" },
+      },
+      required: ["cliente_nombre", "cliente_rut", "cliente_telefono", "cliente_email", "productos", "total", "whatsapp_cliente"],
+    },
+  },
 ];
 
 // Ejecuta la herramienta solicitada por Claude y retorna el resultado como string
@@ -275,6 +294,29 @@ export async function ejecutarHerramienta(name: string, input: Record<string, un
         const msg = error instanceof Error ? error.message : String(error);
         console.error("[tools] Error registrando pedido:", msg);
         return JSON.stringify({ ok: false, mensaje: `Error al registrar el pedido: ${msg}` });
+      }
+    }
+
+    case "registrar_cotizacion": {
+      try {
+        const numeroCotizacion = await registrarCotizacion({
+          clienteNombre: input.cliente_nombre as string,
+          clienteRut: input.cliente_rut as string,
+          clienteTelefono: input.cliente_telefono as string,
+          clienteEmail: input.cliente_email as string,
+          productos: input.productos as string,
+          total: input.total as number,
+          whatsappCliente: input.whatsapp_cliente as string,
+        });
+        return JSON.stringify({
+          ok: true,
+          numeroCotizacion,
+          mensaje: `Cotización #${String(numeroCotizacion).padStart(4, "0")} registrada. Se envió confirmación al correo del cliente y se notificó al vendedor.`,
+        });
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error("[tools] Error registrando cotización:", msg);
+        return JSON.stringify({ ok: false, mensaje: `Error al registrar la cotización: ${msg}` });
       }
     }
 

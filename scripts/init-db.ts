@@ -49,6 +49,19 @@ async function main() {
       total_clp          BIGINT        DEFAULT 0,
       estado             VARCHAR(50)   DEFAULT 'Pendiente'
     );
+
+    CREATE TABLE IF NOT EXISTS cotizaciones (
+      id                 SERIAL        PRIMARY KEY,
+      fecha              TEXT,
+      cliente_nombre     VARCHAR(255),
+      cliente_rut        VARCHAR(30),
+      cliente_telefono   VARCHAR(30),
+      cliente_email      VARCHAR(255),
+      cliente_whatsapp   VARCHAR(30),
+      productos          TEXT,
+      total_clp          BIGINT        DEFAULT 0,
+      estado             VARCHAR(50)   DEFAULT 'Pendiente'
+    );
   `);
   console.log("[init-db] Tablas verificadas ✓");
 

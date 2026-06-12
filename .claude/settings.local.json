@@ -55,7 +55,8 @@
       "Bash(gsutil mb *)",
       "Bash(gsutil cp *)",
       "Bash(gcloud components *)",
-      "Bash(gsutil iam *)"
+      "Bash(gsutil iam *)",
+      "Bash(git commit -m 'feat: agregar flujo de cotizaciones con confirmación por email *)"
     ]
   }
 }
