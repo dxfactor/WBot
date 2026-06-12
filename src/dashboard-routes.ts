@@ -155,75 +155,52 @@ router.patch("/api/dashboard/cotizaciones/:id", requireAuth, async (req, res) =>
   res.json({ ok: true, estado });
 });
 
-// Comparativa enriquecida usando id_catalogo guardado por el agente IA
+// Comparativa desde tabla cotizacion_productos
 router.get("/api/dashboard/cotizaciones/:id/comparativa", requireAuth, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { rows: cotRows } = await pool.query(
-    `SELECT productos_json FROM cotizaciones WHERE id = $1`, [id]
+
+  // Obtener productos individuales de la cotización
+  const { rows: productos } = await pool.query(
+    `SELECT id, nombre_cotizado, cantidad, id_catalogo, nombre_catalogo,
+            es_alternativa, nota, precio_venta, precio_compra, stock
+     FROM cotizacion_productos
+     WHERE cotizacion_id = $1
+     ORDER BY id ASC`,
+    [id]
   );
-  if (!cotRows[0]) { res.status(404).json({ error: "No encontrada" }); return; }
 
-  type ProdCot = {
-    nombre_cotizado: string;
-    cantidad: number;
-    id_catalogo?: string;
-    nombre_catalogo?: string;
-    es_alternativa?: boolean;
-    nota?: string;
-    // legado (cotizaciones antiguas sin estructura nueva)
-    nombre?: string;
-    precio_cotizado?: number;
-  };
+  if (productos.length === 0) {
+    // Fallback a JSON para cotizaciones antiguas
+    const { rows: cotRows } = await pool.query(
+      `SELECT productos_json FROM cotizaciones WHERE id = $1`, [id]
+    );
+    if (!cotRows[0]) { res.status(404).json({ error: "No encontrada" }); return; }
+    res.json(cotRows[0].productos_json ?? []);
+    return;
+  }
 
-  const productos: ProdCot[] = cotRows[0].productos_json ?? [];
+  const comparativa = productos.map(p => {
+    const precioVenta = p.precio_venta ? Number(p.precio_venta) : null;
+    const precioCompra = p.precio_compra ? Number(p.precio_compra) : null;
+    const margen = precioVenta && precioCompra && precioCompra > 0
+      ? Math.round(((precioVenta - precioCompra) / precioCompra) * 100)
+      : null;
 
-  const comparativa = await Promise.all(
-    productos.map(async (p) => {
-      let catRow = null;
-
-      // Buscar por id_catalogo si lo tiene (cotizaciones nuevas)
-      if (p.id_catalogo) {
-        const { rows } = await pool.query(
-          `SELECT id, nombre, stock, precio, precio_compra FROM productos WHERE id = $1`,
-          [p.id_catalogo]
-        );
-        catRow = rows[0] ?? null;
-      }
-
-      // Fallback: buscar por nombre_catalogo o nombre (cotizaciones antiguas)
-      if (!catRow) {
-        const buscar = p.nombre_catalogo ?? p.nombre_cotizado ?? p.nombre ?? "";
-        const q = `%${buscar.split(" ")[0]}%`;
-        const { rows } = await pool.query(
-          `SELECT id, nombre, stock, precio, precio_compra
-           FROM productos WHERE nombre ILIKE $1 ORDER BY nombre LIMIT 1`,
-          [q]
-        );
-        catRow = rows[0] ?? null;
-      }
-
-      const precioVenta  = catRow ? Number(catRow.precio)        : null;
-      const precioCompra = catRow ? Number(catRow.precio_compra) : null;
-      const margen = precioVenta && precioCompra && precioCompra > 0
-        ? Math.round(((precioVenta - precioCompra) / precioCompra) * 100)
-        : null;
-
-      return {
-        nombreCotizado:  p.nombre_cotizado ?? p.nombre ?? "",
-        cantidad:        p.cantidad ?? 0,
-        esAlternativa:   p.es_alternativa ?? false,
-        nota:            p.nota ?? "",
-        catalogo: catRow ? {
-          id:            catRow.id,
-          nombre:        catRow.nombre,
-          stock:         Number(catRow.stock),
-          precioVenta,
-          precioCompra,
-          margen,
-        } : null,
-      };
-    })
-  );
+    return {
+      nombreCotizado:  p.nombre_cotizado ?? "",
+      cantidad:        Number(p.cantidad ?? 0),
+      esAlternativa:   Boolean(p.es_alternativa ?? false),
+      nota:            p.nota ?? "",
+      catalogo: {
+        id:            p.id_catalogo,
+        nombre:        p.nombre_catalogo,
+        stock:         Number(p.stock ?? 0),
+        precioVenta,
+        precioCompra,
+        margen,
+      },
+    };
+  });
 
   res.json(comparativa);
 });

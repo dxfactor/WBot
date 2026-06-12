@@ -101,6 +101,8 @@ const TOOLS_COT: Anthropic.Tool[] = [
 // ── Persistencia ─────────────────────────────────────────────────────────────
 async function guardarCotizacion(userId: string, input: Record<string, unknown>): Promise<string> {
   const fecha = new Date().toLocaleString("es-CL", { timeZone: "America/Santiago" });
+
+  // Insertar cotización
   const { rows } = await pool.query(
     `INSERT INTO cotizaciones
        (fecha, cliente_whatsapp, cliente_nombre, cliente_telefono, cliente_email,
@@ -118,12 +120,36 @@ async function guardarCotizacion(userId: string, input: Record<string, unknown>)
       JSON.stringify(input.productos ?? []),
     ]
   );
-  const id = rows[0].id as number;
-  console.log(`[cotizacion] #${id} guardada para ${userId} — ${input.cliente_email}`);
+  const cotizacionId = rows[0].id as number;
+
+  // Insertar cada producto como registro individual
+  const productos = (input.productos ?? []) as Array<Record<string, unknown>>;
+  for (const prod of productos) {
+    await pool.query(
+      `INSERT INTO cotizacion_productos
+         (cotizacion_id, nombre_cotizado, cantidad, id_catalogo, nombre_catalogo,
+          es_alternativa, nota, precio_venta, precio_compra, stock)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [
+        cotizacionId,
+        String(prod.nombre_cotizado ?? ""),
+        Number(prod.cantidad ?? 0),
+        String(prod.id_catalogo ?? ""),
+        String(prod.nombre_catalogo ?? ""),
+        Boolean(prod.es_alternativa ?? false),
+        String(prod.nota ?? ""),
+        prod.precio_venta ?? null,
+        prod.precio_compra ?? null,
+        prod.stock ?? null,
+      ]
+    );
+  }
+
+  console.log(`[cotizacion] #${cotizacionId} guardada con ${productos.length} productos para ${userId}`);
   return JSON.stringify({
     ok: true,
-    numeroCotizacion: `#${String(id).padStart(4,"0")}`,
-    mensaje: `Cotización registrada con el número *#${String(id).padStart(4,"0")}*. Se enviará por email a ${input.cliente_email}.`,
+    numeroCotizacion: `#${String(cotizacionId).padStart(4,"0")}`,
+    mensaje: `Cotización registrada con el número *#${String(cotizacionId).padStart(4,"0")}*. Se enviará por email a ${input.cliente_email}.`,
   });
 }
 

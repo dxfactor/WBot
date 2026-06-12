@@ -16,7 +16,10 @@
       "Bash(curl -s -o /dev/null -w \"hotel-dashboard.html: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/hotel-dashboard.html)",
       "Bash(curl -s -o /dev/null -w \"cotizaciones-dashboard.html: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
       "Bash(curl -s https://raw.githubusercontent.com/dxfactor/WBot/main/public/cotizaciones-dashboard.html)",
-      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones-ui)"
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones-ui)",
+      "Bash(curl -s -o /dev/null -w \"Webhook: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/webhook)",
+      "Bash(curl -s -o /dev/null -w \"Dashboard \\(local\\): %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"API Cotizaciones: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones)"
     ]
   }
 }
