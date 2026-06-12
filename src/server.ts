@@ -15,6 +15,16 @@ import dashboardRoutes from "./dashboard-routes";
 const app = express();
 app.use(express.json());
 
+// Deshabilitar cache para APIs dinámicas
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+  next();
+});
+
 // Servir archivos estáticos desde public/
 const publicPath = path.resolve(__dirname, "../public");
 app.use(express.static(publicPath));

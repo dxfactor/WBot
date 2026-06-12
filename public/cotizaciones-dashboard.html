@@ -544,6 +544,14 @@
     document.getElementById('filtroEstado').addEventListener('change', cargarCotizaciones);
     cargarCotizaciones();
 
+    // Auto-refresh cada 30 segundos (sin cache)
+    setInterval(() => {
+      const filtro = document.getElementById('filtroEstado').value;
+      if (!document.getElementById('detallesModal').classList.contains('active')) {
+        cargarCotizaciones();
+      }
+    }, 30000);
+
     // Cerrar modal al hacer click afuera
     document.getElementById('detallesModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('detallesModal')) cerrarModal();

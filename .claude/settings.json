@@ -19,7 +19,14 @@
       "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones-ui)",
       "Bash(curl -s -o /dev/null -w \"Webhook: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/webhook)",
       "Bash(curl -s -o /dev/null -w \"Dashboard \\(local\\): %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/dashboard.html)",
-      "Bash(curl -s -o /dev/null -w \"API Cotizaciones: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones)"
+      "Bash(curl -s -o /dev/null -w \"API Cotizaciones: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones)",
+      "Bash(curl -s -o /dev/null -w \"Dashboard: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/dashboard.html)",
+      "Bash(chmod +x /tmp/test_local.sh)",
+      "Bash(bash /tmp/test_local.sh)",
+      "Bash(brew services *)",
+      "Bash(chmod +x /tmp/test_cloud_run.sh)",
+      "Bash(bash /tmp/test_cloud_run.sh)",
+      "Bash(bash /tmp/diagnose_latency.sh)"
     ]
   }
 }
