@@ -10,7 +10,13 @@
       "Bash(curl -s -o /dev/null -w \"cotizaciones-dashboard.html status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
       "Bash(curl -s https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
       "Bash(curl -s -o /dev/null -w \"Dashboard status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones)",
-      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones)"
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones)",
+      "Bash(curl -s -w \"\\\\nStatus: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones)",
+      "Bash(curl -s -o /dev/null -w \"dashboard.html: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"hotel-dashboard.html: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/hotel-dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"cotizaciones-dashboard.html: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/cotizaciones-dashboard.html)",
+      "Bash(curl -s https://raw.githubusercontent.com/dxfactor/WBot/main/public/cotizaciones-dashboard.html)",
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" https://wbot-5ho6y3ckpa-uc.a.run.app/api/dashboard/cotizaciones-ui)"
     ]
   }
 }

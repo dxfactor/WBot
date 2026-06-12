@@ -237,4 +237,9 @@ router.get("/api/dashboard/tokens", requireAuth, (_req, res) => {
   });
 });
 
+// ── Dashboard HTML (vía API) ────────────────────────────────────────────────
+router.get("/cotizaciones-html", requireAuth, (_req, res) => {
+  res.redirect("/cotizaciones");
+});
+
 export default router;
