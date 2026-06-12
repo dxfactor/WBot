@@ -63,8 +63,11 @@ jobs:
               SESSION_SECRET=${{ secrets.SESSION_SECRET }},\
               DASHBOARD_USER=${{ secrets.DASHBOARD_USER }},\
               DASHBOARD_PASS=${{ secrets.DASHBOARD_PASS }},\
+              EMAIL_SERVICE=gmail,\
               DEV_TOOLS=false,\
               PORT=8080" \
             --set-secrets "WHATSAPP_ACCESS_TOKEN=WHATSAPP_ACCESS_TOKEN:latest,\
               ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,\
-              OPENAI_API_KEY=OPENAI_API_KEY:latest"
+              OPENAI_API_KEY=OPENAI_API_KEY:latest,\
+              EMAIL_USER=EMAIL_USER:latest,\
+              EMAIL_PASS=EMAIL_PASS:latest"
